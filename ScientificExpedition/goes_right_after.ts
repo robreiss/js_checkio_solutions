@@ -14,7 +14,17 @@
 import assert from "assert";
 
 function goesAfter(word: string, first: string, second: string): boolean {
-    // your code here
+    if (first == second) {
+        return false
+    }
+    const i1 = word.indexOf(first)
+    const i2 = word.indexOf(second)
+    if (i1 < 0 || i2 < 0) {
+        return false
+    }
+    if (i1 + 1 == i2) {
+        return true
+    }
     return false;
 }
 
