@@ -14,8 +14,18 @@
 import assert from "assert";
 
 function sumByTypes(values: Array<number|string>): [string, number] {
-    // your code here
-    return ['', 0];
+    let numResult: number = 0
+    let strResult: string = ''
+
+    for (let val of values) {
+        if (typeof val == "number") {
+            numResult += val
+        } else {
+            strResult += val
+        }
+    }
+
+    return [strResult, numResult];
 }
 
 console.log('Example:');
