@@ -32,12 +32,30 @@
 import assert from "assert";
 
 function largestHistogram(values: number[]): number {
-    // your code here
-    return 0;
+    let result = 0
+    for(let x=0; x<values.length; x++) {
+        for(let y=1; y <= values[x] ; y++) {
+            let rectsize = 0
+            for(let x2=x; x2<values.length; x2++) {
+                if (values[x2] >= y) {
+                    rectsize += y
+                } else {
+                    break
+                }
+            }
+            if (rectsize > result) {
+                result = rectsize
+            }
+            // console.log(rectsize)
+        }
+    }
+    // console.log(result)
+    return result;
 }
 
 console.log("Example:");
-console.log(largestHistogram([5]));
+// console.log(largestHistogram([5]));
+console.log(largestHistogram([2, 1, 4, 5, 1, 3, 3]))
 
 // These "asserts" are used for self-checking
 assert.equal(largestHistogram([5]), 5);
