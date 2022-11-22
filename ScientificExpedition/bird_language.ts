@@ -19,8 +19,25 @@
 import assert from "assert";
 
 function translate(text: string): string {
-    // your code here
-    return text;
+    // console.log(text)
+    let res = "" 
+    let vowels = /[aeiouy]/
+    let letters = /[a-z]/
+    for (let i = 0; i < text.length;) {
+        res += text[i]
+        // console.log(text[i])
+        if (vowels.test(text[i])) {
+            // console.log('match vowel')
+            i += 3
+        } else if (letters.test(text[i])) {
+            // console.log('match consonant')
+            i += 2
+        } else {
+            // console.log('match space')
+            i += 1
+        }
+    }
+    return res
 }
 
 console.log('Example:');
