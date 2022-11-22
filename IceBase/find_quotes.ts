@@ -12,12 +12,18 @@
 import assert from "assert";
 
 function findQuotes(text: string): string[] {
-    // your code here
-    return [];
+    let re = /\"(.*?)\"+/g
+    let out: string[] = []
+    var current;
+    while (current = re.exec(text)) {
+        out.push(current[1])
+    }
+    return out;
 }
 
 console.log('Example:');
 console.log(findQuotes('"Greetings"'));
+console.log(findQuotes('"this" doesn\'t make any "sense" or does it'));
 
 // These "asserts" are used for self-checking
 assert.deepEqual(findQuotes('"Greetings"'), ['Greetings']);
