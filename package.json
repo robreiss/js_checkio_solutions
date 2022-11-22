@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "assert": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/node": "^18.11.9",
+    "ts-node-dev": "^2.0.0"
+  }
+}
