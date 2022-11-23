@@ -13,16 +13,46 @@
 
 import assert from "assert";
 
+const debug = true
+function cl(out: string) {
+    if (debug) {
+        console.log(out)
+    }
+}
+
 function longRepeat(line: string): number {
-    // your code here
-    return 0;
+    // cl('NEW ' + line)
+    if (line.length == 0) 
+        return 0
+    let longest = 1
+    let testlen = 1 
+    let c = ''
+    for (let i=0; i<line.length; i++) {
+        // console.log(line[i])
+        if (line[i] == c) {
+            // console.log('match', c)
+            testlen++
+            if (testlen > longest) {
+                longest = testlen
+            }
+        } else {
+            c = line[i]
+            // console.log(`${c} - ${testlen}`)
+            testlen = 1
+        }
+    }
+    return longest;
 }
 
 console.log("Example:");
-console.log(longRepeat("sdsffffse"));
+// console.log(longRepeat("sdsffffse"));
+// console.log(longRepeat("ddvvrwwwrggg"));
+// console.log(longRepeat("aa"))
+console.log(longRepeat("abababa"))
 
 // These "asserts" are used for self-checking
 assert.strictEqual(longRepeat("sdsffffse"), 4);
 assert.strictEqual(longRepeat("ddvvrwwwrggg"), 3);
+assert.strictEqual(longRepeat("aa"), 2)
 
 console.log("Coding complete? Click 'Check Solution' to earn rewards!");
