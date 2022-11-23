@@ -24,12 +24,23 @@
 import assert from "assert";
 
 function reverseRoman(data: string): number {
-    // your code here
-    return 1;
+    // console.log(data)
+    const dec = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+    const rom = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I']
+    let result = 0
+    for (let i = 0; i < rom.length; i++) {
+        while(data.indexOf(rom[i]) == 0) {
+            data = data.substring(rom[i].length)
+            result += dec[i]
+            // console.log(i, rom[i], rom[i].length, data, result)
+        }
+    }
+    return result;
 }
 
 console.log('Example:');
-console.log(reverseRoman('I'));
+// console.log(reverseRoman('I'));
+console.log(reverseRoman('MMMCMXCIX'))
 
 // These "asserts" are used for self-checking
 assert.equal(reverseRoman('I'), 1);
