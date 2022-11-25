@@ -57,33 +57,130 @@
 // END_DESC
 
 import assert from "assert";
+import { exit } from "process";
+
+function allNumbers(value: string, partial: string[], result: string[][]) {
+    let n: string[] = [];
+    for (let i = 1; i < value.length; i++) {
+        n = [...partial]
+        let left = value.substring(0, i)
+        let right = value.substring(i, value.length)
+        n.push(left)
+        allNumbers(right, [...n], result)
+        n.push(right)
+        result.push(n)
+    }
+}
+
+function ops(nums: string[], partial: string[], result: string[][]) {
+    let op = '+-*/'
+    for (let c of op) {
+        let n: string[] = [...partial]
+        let left = nums[0]
+        let right = nums.slice(1)
+        if (right.length == 0) {
+            return
+        }
+        n.push(left)
+        n.push(c)
+        if (right.length == 1) {
+            n.push(...right)
+            result.push(n)
+        }
+        ops(right, [...n], result)
+    }
+}
+
+function paren(nums: string[], partial: string[], result: string[][]) {
+    // console.log((nums.length - 1) / 2, nums)
+    for (let i = 0; i < (nums.length-1)/2; i++) {
+        let n: string[] = []
+        n.push('(')
+        n.push(nums[i])
+        n.push(nums[i+1])
+    }
+}
 
 function luckyTickets(value: string): boolean {
-    // your code here
+    let result1: string[][] = []
+    result1.push(new Array(value))
+    allNumbers(value, [], result1)
+
+    let result2: string[][] = []
+    for (let r of result1) {
+        ops(r, [], result2)
+    }
+
+    let result3: string[][] = []
+    for (let r of result2) {
+        paren(r, [], result3)
+    }
+
+    // console.log(result2)
     return false;
 }
 
 console.log('Example:');
-console.log(luckyTickets('000000'));
+console.log(luckyTickets('1234'));
+// console.log(luckyTickets('707409'));
+// console.log(luckyTickets('5050'));
+// console.log(luckyTickets('555095'));
+
+// (1 + 2) + (3 + 4)
+// (1 + 2 + 3) + 4
+// (1 + 2 + 3 + 4)
+// 1 + (2 + 3 + 4)
+// 1 + 2 (3 + 4)
+// ((1 + 2) + 3) + 4
+// (())
 
 // These "asserts" are used for self-checking
-assert.equal(luckyTickets('000000'), true);
-assert.equal(luckyTickets('707409'), true);
-assert.equal(luckyTickets('595347'), false);
-assert.equal(luckyTickets('271353'), false);
-assert.equal(luckyTickets('000955'), false);
-assert.equal(luckyTickets('100478'), true);
-assert.equal(luckyTickets('100479'), false);
-assert.equal(luckyTickets('725126'), true);
-assert.equal(luckyTickets('836403'), false);
-assert.equal(luckyTickets('240668'), false);
-assert.equal(luckyTickets('082140'), true);
-assert.equal(luckyTickets('574699'), false);
-assert.equal(luckyTickets('324347'), false);
-assert.equal(luckyTickets('064377'), true);
-assert.equal(luckyTickets('111111'), false);
-assert.equal(luckyTickets('555555'), false);
-assert.equal(luckyTickets('777777'), false);
-assert.equal(luckyTickets('392039'), false);
+// assert.equal(luckyTickets('000000'), true);
+// assert.equal(luckyTickets('707409'), true);
+// assert.equal(luckyTickets('595347'), false);
+// assert.equal(luckyTickets('271353'), false);
+// assert.equal(luckyTickets('000955'), false);
+// assert.equal(luckyTickets('100478'), true);
+// assert.equal(luckyTickets('100479'), false);
+// assert.equal(luckyTickets('725126'), true);
+// assert.equal(luckyTickets('836403'), false);
+// assert.equal(luckyTickets('240668'), false);
+// assert.equal(luckyTickets('082140'), true);
+// assert.equal(luckyTickets('574699'), false);
+// assert.equal(luckyTickets('324347'), false);
+// assert.equal(luckyTickets('064377'), true);
+// assert.equal(luckyTickets('111111'), false);
+// assert.equal(luckyTickets('555555'), false);
+// assert.equal(luckyTickets('777777'), false);
+// assert.equal(luckyTickets('392039'), false);
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
+
+function ops2(nums: string[]) {
+    let ops = '+-*/'
+    let res: string[][] = []
+    let ans: string[] = []
+    for (let c of ops) {
+        for (let i = 0; i < nums.length; i++) {
+            let num: number = parseInt(nums[i])
+            // if (num > 0) {
+            ans.push(num.toString())
+            if (i < nums.length - 1) {
+                ans.push(c)
+            }
+            // }
+        }
+        res.push(ans)
+        let formula: string = ans.join('')
+        // console.log(formula, eval(formula))
+        let hun = eval(formula)
+        console.log(formula, hun)
+        if (hun == 100) {
+            console.log('LUCKY')
+            exit()
+        }
+        // console.log(formula)
+        ans = []
+    }
+    return res
+}
