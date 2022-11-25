@@ -95,18 +95,31 @@ function identifyBlock(values: number[]): string | null {
 
 console.log('Example:');
 // console.log(identifyBlock([10, 13, 14, 15]));
-console.log(identifyBlock([2, 3, 7, 11]))
+// console.log(identifyBlock([2, 3, 7, 11]))
 // console.log(identifyBlock([1, 5, 9, 6]))
 
+function test(n: number[]) {
+    var i, c = n.map((v: number) => (v--, [v % 4, 0 | v / 4]))
+        console.log(c)
+    for (i = 0; i < 4; i++) {
+        c = c.map(([x, y]) => [y, -x])
+        console.log(c)
+    }
+
+}
+
+// console.log(test([1, 2, 3, 4]))
+console.log(test([10, 13, 14, 15]))
+
 // These "asserts" are used for self-checking
-assert.equal(identifyBlock([10, 13, 14, 15]), 'T');
-assert.equal(identifyBlock([1, 5, 9, 6]), 'T');
-assert.equal(identifyBlock([2, 3, 7, 11]), 'L');
-assert.equal(identifyBlock([4, 8, 12, 16]), 'I');
-assert.equal(identifyBlock([3, 1, 5, 8]), undefined);
-assert.equal(identifyBlock([6, 7, 10, 11]), 'O');
-assert.equal(identifyBlock([6, 10, 11, 15]), 'S');
-assert.equal(identifyBlock([7, 6, 10, 14]), 'J');
-assert.equal(identifyBlock([3, 6, 7, 10]), 'Z');
+// assert.equal(identifyBlock([10, 13, 14, 15]), 'T');
+// assert.equal(identifyBlock([1, 5, 9, 6]), 'T');
+// assert.equal(identifyBlock([2, 3, 7, 11]), 'L');
+// assert.equal(identifyBlock([4, 8, 12, 16]), 'I');
+// assert.equal(identifyBlock([3, 1, 5, 8]), undefined);
+// assert.equal(identifyBlock([6, 7, 10, 11]), 'O');
+// assert.equal(identifyBlock([6, 10, 11, 15]), 'S');
+// assert.equal(identifyBlock([7, 6, 10, 14]), 'J');
+// assert.equal(identifyBlock([3, 6, 7, 10]), 'Z');
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
