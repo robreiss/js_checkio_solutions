@@ -17,17 +17,52 @@
 
 import assert from "assert";
 
+// function swap(a: string, i: number, j: number): string {
+//     let temp: string;
+//     let charArray = a.split("");
+//     temp = charArray[i];
+//     charArray[i] = charArray[j];
+//     charArray[j] = temp;
+//     return (charArray).join("");
+// }
+
+// function permute(str: string, l: number, r: number, check: string) {
+//     if (l == r && str === check) {
+//         // console.log("true", str);
+//         return true
+//     }
+//     else {
+//         for (let i = l; i <= r; i++) {
+//             str = swap(str, l, i);
+//             if (permute(str, l + 1, r, check)) {
+//                 return true
+//             }
+//             str = swap(str, l, i);
+//         }
+//     }
+//     return false
+// }
+
 function verifyAnagrams(line1: string, line2: string): boolean {
-    // your code here
-    return false;
+    line1 = line1.replace(/\s/g, '').toLowerCase().split('').sort().join('')
+    line2 = line2.replace(/\s/g, '').toLowerCase().split('').sort().join('')
+    if (line1 === line2) {
+        return true
+    }
+    // return permute(line1, 0, line1.length - 1, line2)
+    return false
 }
 
 console.log('Example:');
-console.log(verifyAnagrams('Programming', 'Gram Ring Mop'));
+// console.log(verifyAnagrams('Programming', 'Gram Ring Mop'));
+// console.log(verifyAnagrams('Kyoto', 'Tokyo'))
 
 // These "asserts" are used for self-checking
-assert.equal(verifyAnagrams('Programming', 'Gram Ring Mop'), true);
-assert.equal(verifyAnagrams('Hello', 'Ole Oh'), false);
-assert.equal(verifyAnagrams('Kyoto', 'Tokyo'), true);
+// assert.equal(verifyAnagrams('Programming', 'Gram Ring Mop'), true)
+// assert.equal(verifyAnagrams('Hello', 'Ole Oh'), false);
+// assert.equal(verifyAnagrams('Kyoto', 'Tokyo'), true);
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
+
+// 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU'
+// 'UTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba'
