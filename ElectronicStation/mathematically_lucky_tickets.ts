@@ -65,9 +65,9 @@ function allNumbers(value: string, partial: string[], result: string[][]) {
         n = [...partial]
         let left = value.substring(0, i)
         let right = value.substring(i, value.length)
-        n.push(left)
+        n.push(Number(left).toString())
         allNumbers(right, [...n], result)
-        n.push(right)
+        n.push(Number(right).toString())
         result.push(n)
     }
 }
@@ -92,15 +92,15 @@ function ops(nums: string[], partial: string[], result: string[][]) {
 }
 
 function cartesian(...args: string[][]) {
-    var r: string[][] = [], max = args.length-1;
+    var r: string[][] = [], max = args.length - 1;
     function helper(arr: string[], i: number) {
-        for (var j=0, l=args[i].length; j<l; j++) {
+        for (var j = 0, l = args[i].length; j < l; j++) {
             var a = arr.slice(0); // clone arr
             a.push(args[i][j]);
-            if (i==max)
+            if (i == max)
                 r.push(a);
             else
-                helper(a, i+1);
+                helper(a, i + 1);
         }
     }
     helper([], 0);
@@ -116,20 +116,32 @@ function paren(nums: string[], partial: string[], result: string[]) {
             let middle = nums.slice(i, j + 1)
             let right = nums.slice(j + 1)
 
-            if (middle.length < nums.length) {
-                let x: string[] = []
-                paren(middle, [], x)
-                for (let d of x) {
-                    console.log(d)
-                    // let r = [...left, '(', ...middle, ')', ...right]
-                    if (!(d[0] == '(' && d[d.length  - 1] == ')')) {
-                        let r = [...left, '(', d, ')', ...right]
-                        result.push(r.join(''))
+            let lp: string[] = []
+            lp.push(left.join(''))
+            paren(left, [], lp)
+            // console.log(lp)
+
+            for (let i = 0; i<lp.length; i++) {
+                let lr = lp[i]
+                let mids: string[] = []
+                if (middle.length < nums.length) {
+                    let x: string[] = []
+                    paren(middle, [], x)
+                    for (let d of x) {
+                        // if (lr == '(1+2)+') {
+                        //     console.log(lr, d)
+                        // }
+                        // let r = [...left, '(', ...middle, ')', ...right]
+                        if (!(d[0] == '(' && d[d.length - 1] == ')') || i>0) {
+                            let r = [lr, '(', d, ')', ...right]
+                            mids.push(r.join(''))
+                            result.push(r.join(''))
+                        }
                     }
                 }
             }
             // let dd = cartesian(left, middle)
-            console.log(dd)
+            // console.log(dd)
             let r = [...left, '(', ...middle, ')', ...right]
             result.push(r.join(''))
         }
@@ -146,13 +158,20 @@ function luckyTickets(value: string): boolean {
         ops(r, [], result2)
     }
 
-    // // let result3: string[][] = []
-    // // for (let r of result2) {
-    // //     paren(r, [], result3)
-    // // }
+    let result3: string[] = []
+    for (let r of result2) {
+        paren(r, [], result3)
+    }
 
+    for (let e of result3) {
+        // console.log(e)
+        if (eval(e) == 100) {
+            console.log(value, e)
+            return false
+        }
+    }
     // console.log(result3)
-    return false;
+    return true;
 }
 
 console.log('Example:');
@@ -160,6 +179,9 @@ console.log('Example:');
 // console.log(luckyTickets('707409'));
 // console.log(luckyTickets('5050'));
 // console.log(luckyTickets('555095'));
+// console.log(luckyTickets('595347'));
+// console.log(luckyTickets('392039'));
+
 let res: string[] = []
 // paren(['1', '+'], [], res)
 // paren(['+', '2'], [], res)
@@ -167,8 +189,9 @@ let res: string[] = []
 // paren(['1', '+', '2'], [], res)
 // paren(['1', '+', '2', '+', '3'], [], res)
 // paren(['1', '+', '2', '+', '3', '+', '4'], [], res)
-paren(['1', '+', '2', '+', '3', '+', '4', '+', '5'], [], res)
-console.log(res)
+// paren(['1', '+', '2', '+', '3', '+', '4', '+', '5'], [], res)
+// (5 + ((9 * 5) + (3 + 47)))
+// console.log(res)
 
 // (1 + 2) + 3 + 4
 // (1 + 2 + 3) + 4
@@ -193,23 +216,23 @@ console.log(res)
 // (1 + 2) + ((3 + 4) + (5 + 6))
 
 // These "asserts" are used for self-checking
-// assert.equal(luckyTickets('000000'), true);
-// assert.equal(luckyTickets('707409'), true);
-// assert.equal(luckyTickets('595347'), false);
-// assert.equal(luckyTickets('271353'), false);
-// assert.equal(luckyTickets('000955'), false);
-// assert.equal(luckyTickets('100478'), true);
-// assert.equal(luckyTickets('100479'), false);
-// assert.equal(luckyTickets('725126'), true);
-// assert.equal(luckyTickets('836403'), false);
-// assert.equal(luckyTickets('240668'), false);
-// assert.equal(luckyTickets('082140'), true);
-// assert.equal(luckyTickets('574699'), false);
-// assert.equal(luckyTickets('324347'), false);
-// assert.equal(luckyTickets('064377'), true);
-// assert.equal(luckyTickets('111111'), false);
-// assert.equal(luckyTickets('555555'), false);
-// assert.equal(luckyTickets('777777'), false);
-// assert.equal(luckyTickets('392039'), false);
+assert.equal(luckyTickets('000000'), true);
+assert.equal(luckyTickets('707409'), true);
+assert.equal(luckyTickets('595347'), false);
+assert.equal(luckyTickets('271353'), false);
+assert.equal(luckyTickets('000955'), false);
+assert.equal(luckyTickets('100478'), true);
+assert.equal(luckyTickets('100479'), false);
+assert.equal(luckyTickets('725126'), true);
+assert.equal(luckyTickets('836403'), false);
+assert.equal(luckyTickets('240668'), false);
+assert.equal(luckyTickets('082140'), true);
+assert.equal(luckyTickets('574699'), false);
+assert.equal(luckyTickets('324347'), false);
+assert.equal(luckyTickets('064377'), true);
+assert.equal(luckyTickets('111111'), false);
+assert.equal(luckyTickets('555555'), false);
+assert.equal(luckyTickets('777777'), false);
+assert.equal(luckyTickets('392039'), false);
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
