@@ -91,13 +91,48 @@ function ops(nums: string[], partial: string[], result: string[][]) {
     }
 }
 
-function paren(nums: string[], partial: string[], result: string[][]) {
-    // console.log((nums.length - 1) / 2, nums)
-    for (let i = 0; i < (nums.length-1)/2; i++) {
-        let n: string[] = []
-        n.push('(')
-        n.push(nums[i])
-        n.push(nums[i+1])
+function cartesian(...args: string[][]) {
+    var r: string[][] = [], max = args.length-1;
+    function helper(arr: string[], i: number) {
+        for (var j=0, l=args[i].length; j<l; j++) {
+            var a = arr.slice(0); // clone arr
+            a.push(args[i][j]);
+            if (i==max)
+                r.push(a);
+            else
+                helper(a, i+1);
+        }
+    }
+    helper([], 0);
+    return r;
+}
+
+function paren(nums: string[], partial: string[], result: string[]) {
+    for (let i = 0; i < nums.length; i = i + 2) {
+        for (let j = i + 2; j < nums.length; j = j + 2) {
+
+            let left: string[] = [...nums.slice(0, i)]
+            // console.log(left)
+            let middle = nums.slice(i, j + 1)
+            let right = nums.slice(j + 1)
+
+            if (middle.length < nums.length) {
+                let x: string[] = []
+                paren(middle, [], x)
+                for (let d of x) {
+                    console.log(d)
+                    // let r = [...left, '(', ...middle, ')', ...right]
+                    if (!(d[0] == '(' && d[d.length  - 1] == ')')) {
+                        let r = [...left, '(', d, ')', ...right]
+                        result.push(r.join(''))
+                    }
+                }
+            }
+            // let dd = cartesian(left, middle)
+            console.log(dd)
+            let r = [...left, '(', ...middle, ')', ...right]
+            result.push(r.join(''))
+        }
     }
 }
 
@@ -111,20 +146,43 @@ function luckyTickets(value: string): boolean {
         ops(r, [], result2)
     }
 
-    let result3: string[][] = []
-    for (let r of result2) {
-        paren(r, [], result3)
-    }
+    // // let result3: string[][] = []
+    // // for (let r of result2) {
+    // //     paren(r, [], result3)
+    // // }
 
-    // console.log(result2)
+    // console.log(result3)
     return false;
 }
 
 console.log('Example:');
-console.log(luckyTickets('1234'));
+// console.log(luckyTickets('1234'));
 // console.log(luckyTickets('707409'));
 // console.log(luckyTickets('5050'));
 // console.log(luckyTickets('555095'));
+let res: string[] = []
+// paren(['1', '+'], [], res)
+// paren(['+', '2'], [], res)
+// paren(['1', '+', '2'], [], res)
+// paren(['1', '+', '2'], [], res)
+// paren(['1', '+', '2', '+', '3'], [], res)
+// paren(['1', '+', '2', '+', '3', '+', '4'], [], res)
+paren(['1', '+', '2', '+', '3', '+', '4', '+', '5'], [], res)
+console.log(res)
+
+// (1 + 2) + 3 + 4
+// (1 + 2 + 3) + 4
+// (1 + 2 + 3 + 4)
+// ((1 + 2) + 3) + 4
+// (1 + (2 + 3)) + 4
+// 1 + (2 + 3) + 4
+// 1 + (2 + 3 + 4)
+// 1 + ((2 + 3) + 4)
+// 1 + (2 + (3 + 4))
+// 1 + 2 + (3 + 4)
+// 1 + 2 + 3 + 4
+// 1 + 2 + 3 + 4
+//
 
 // (1 + 2) + (3 + 4)
 // (1 + 2 + 3) + 4
@@ -132,7 +190,7 @@ console.log(luckyTickets('1234'));
 // 1 + (2 + 3 + 4)
 // 1 + 2 (3 + 4)
 // ((1 + 2) + 3) + 4
-// (())
+// (1 + 2) + ((3 + 4) + (5 + 6))
 
 // These "asserts" are used for self-checking
 // assert.equal(luckyTickets('000000'), true);
@@ -155,32 +213,3 @@ console.log(luckyTickets('1234'));
 // assert.equal(luckyTickets('392039'), false);
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
-
-function ops2(nums: string[]) {
-    let ops = '+-*/'
-    let res: string[][] = []
-    let ans: string[] = []
-    for (let c of ops) {
-        for (let i = 0; i < nums.length; i++) {
-            let num: number = parseInt(nums[i])
-            // if (num > 0) {
-            ans.push(num.toString())
-            if (i < nums.length - 1) {
-                ans.push(c)
-            }
-            // }
-        }
-        res.push(ans)
-        let formula: string = ans.join('')
-        // console.log(formula, eval(formula))
-        let hun = eval(formula)
-        console.log(formula, hun)
-        if (hun == 100) {
-            console.log('LUCKY')
-            exit()
-        }
-        // console.log(formula)
-        ans = []
-    }
-    return res
-}
