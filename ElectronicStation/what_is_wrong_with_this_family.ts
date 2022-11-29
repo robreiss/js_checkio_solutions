@@ -99,7 +99,52 @@ function containsDuplicates(array: string[]) {
     return false;
 }
 
-function addNodes(tree: string[][], root: node): { newRoot: node, isGood: boolean } {
+function addNodes(tree: string[][], families: node[]) {
+    for (let [father, son] of tree) {
+        // console.log('name', father, son)
+        let hasFamily: boolean = false
+        let foundChild: node | undefined = undefined
+        let foundFamily: number = -1
+        for (let f = 0; f < families.length; f++) {
+            let n = families[f].findNode(father)
+            if (n) {
+                let sonNode = new node(son)
+                foundChild = sonNode
+                foundFamily = f
+                n.sons.push(sonNode)
+                hasFamily = true
+                break
+            }
+        }
+        for (let f = 0; f < families.length; f++) {
+            if (f == foundFamily) {
+                continue
+            }
+            if (families[f].name == son) {
+                if (foundChild) {
+                    for (let sonNode of families[f].sons) {
+                        foundChild.sons.push(sonNode)
+                    }
+                    families.splice(f,1) 
+                } else {
+                    let fatherNode = new node(father)
+                    fatherNode.sons.push(families[f])
+                    families[f] = fatherNode
+                }
+                hasFamily = true
+                break
+            }
+        }
+        if (!hasFamily) {
+            let fatherNode = new node(father)
+            let sonNode = new node(son)
+            fatherNode.sons.push(sonNode)
+            families.push(fatherNode)
+        }
+    }
+}
+
+function addNodes2(tree: string[][], root: node): { newRoot: node, isGood: boolean } {
     let notFoundList: string[][] = []
     let foundOne: boolean = false
     for (let i = 0; i < tree.length; i++) {
@@ -116,7 +161,7 @@ function addNodes(tree: string[][], root: node): { newRoot: node, isGood: boolea
         return { newRoot: root, isGood: false }
     }
     if (notFoundList.length > 0) {
-        return addNodes(notFoundList, root)
+        return addNodes2(notFoundList, root)
     }
     return { newRoot: root, isGood: true }
 }
@@ -125,32 +170,48 @@ function isFamily(tree: [string, string][]): boolean {
     if (!tree || tree.length == 0) {
         return false
     }
-    let root: node = new node(tree[0][0])
 
-    let { newRoot, isGood } = addNodes(tree, root)
-    if (!isGood) {
-        return isGood
-    }
+    let families: node[] = []
+    addNodes(tree, families)
 
-    let names: string[] = []
-    newRoot.flatten(names)
-    if (containsDuplicates(names)) {
+    // print familes
+    // for (let fam of families) {
+    //     console.log('fam')
+    //     fam.printTree('')
+    // }
+
+    if (families.length > 1) {
+        // console.log('multiple families')
         return false
     }
 
-    return isGood
+    let names: string[] = []
+    families[0].flatten(names)
+    if (containsDuplicates(names)) {
+        // console.log('DUPES')
+        return false
+    }
+
+    return true
+    // let { newRoot, isGood } = addNodes(tree, root)
+    // if (!isGood) {
+    //     return isGood
+    // }
+
+
+    // return isGood
 }
 
 console.log("Example:");
 console.log(
     isFamily([
-            ["Logan", "Mike"],
-            ["Logan", "Jack"],
-            ["Mike", "Logan"],
-
         // ["Logan", "Mike"],
-        // ["Alexander", "Jack"],
-        // ["Jack", "Logan"],
+        // ["Logan", "Jack"],
+        // ["Mike", "Logan"],
+
+        ["Logan", "Mike"],
+        ["Alexander", "Jack"],
+        ["Jack", "Logan"],
 
         // ["Logan", "William"],
         // ["Logan", "Jack"],
