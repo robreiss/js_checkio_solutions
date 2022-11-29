@@ -19,19 +19,34 @@
 import assert from "assert";
 
 function unixMatch(filename: string, pattern: string): boolean {
-    // your code here
-    return true;
+    console.log('pattern:', pattern)
+    pattern = pattern.replace(/\./g, "\\.")
+    pattern = pattern.replace(/\*/g, ".*")
+    pattern = pattern.replace(/\?/g, ".")
+    pattern = `^${pattern}$`
+    console.log('regex:', pattern)
+    console.log('filename:',filename)
+    let re: RegExp = new RegExp(pattern)
+    if (re.test(filename)) {
+        console.log('MATCHED')
+        return true;
+    } else {
+        console.log('NO MATCH')
+        return false;
+    }
 }
 
 console.log('Example:');
-console.log(unixMatch('somefile.txt', '*'));
-
+// console.log(unixMatch('somefile.txt', '*.t.t'))
+// console.log(unixMatch('log12.txt', 'log??.txt'))
+console.log(unixMatch("12apache1", "*.*")) // false
 // These "asserts" are used for self-checking
-assert.equal(unixMatch('somefile.txt', '*'), true);
-assert.equal(unixMatch('other.exe', '*'), true);
-assert.equal(unixMatch('my.exe', '*.txt'), false);
-assert.equal(unixMatch('log1.txt', 'log?.txt'), true);
-assert.equal(unixMatch('log12.txt', 'log?.txt'), false);
-assert.equal(unixMatch('log12.txt', 'log??.txt'), true);
-
+if (true) {
+    assert.equal(unixMatch('somefile.txt', '*'), true);
+    assert.equal(unixMatch('other.exe', '*'), true);
+    assert.equal(unixMatch('my.exe', '*.txt'), false);
+    assert.equal(unixMatch('log1.txt', 'log?.txt'), true);
+    assert.equal(unixMatch('log12.txt', 'log?.txt'), false);
+    assert.equal(unixMatch('log12.txt', 'log??.txt'), true);
+}
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
