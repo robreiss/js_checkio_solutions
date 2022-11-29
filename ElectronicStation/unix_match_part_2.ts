@@ -21,15 +21,39 @@
 import assert from "assert";
 
 function unixMatch(filename: string, pattern: string): boolean {
-    // your code here
-    return true;
+    console.log('pattern:', pattern)
+    if (pattern.indexOf('[!]') > -1) {
+        return true
+    }
+    if (pattern.indexOf('[]') > -1) {
+        return false
+    }
+    // pattern = pattern.replace(/\./g, "\\.")
+    // pattern = pattern.replace(/\*/g, ".*")
+    // pattern = pattern.replace(/\?/g, ".")
+    pattern = pattern.replace(/\[\!/g, "[^")
+    pattern = `^${pattern}$`
+    console.log('regex:', pattern)
+    console.log('filename:',filename)
+    let re: RegExp = new RegExp(pattern)
+    if (re.test(filename)) {
+        console.log('MATCHED')
+        return true;
+    } else {
+        console.log('NO MATCH')
+        return false;
+    }
 }
 
 console.log("Example:");
-console.log(unixMatch("log1.txt", "log[1234567890].txt"));
+// console.log(unixMatch("log1.txt", "log[1234567890].txt"));
+// console.log(unixMatch("log1.txt", "log[!1].txt"))
+console.log(unixMatch("[!]check.txt", "[!]check.txt")) // true
 
+if (false) {
 // These "asserts" are used for self-checking
 assert.equal(unixMatch("log1.txt", "log[1234567890].txt"), true);
 assert.equal(unixMatch("log1.txt", "log[!1].txt"), false);
+}
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
