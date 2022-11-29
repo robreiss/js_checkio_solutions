@@ -22,41 +22,6 @@
 
 import assert from "assert";
 
-function isFamily2(tree: [string, string][]): boolean {
-    let son: string[] = []
-    let father: string[] = []
-    father.push(tree[0][0])
-    son.push(tree[0][1])
-    for (let i = 1; i < tree.length; i++) {
-        if (tree[i][1] == tree[i][0]) {
-            return false
-        }
-        if (son.indexOf(tree[i][1]) > -1) {
-            return false
-        } else {
-            son.push(tree[i][1])
-        }
-    }
-    for (let i = 1; i < tree.length; i++) {
-        if (father.indexOf(tree[i][0]) == -1 && son.indexOf(tree[i][0]) == -1) {
-            return false
-        }
-        if (father.indexOf(tree[i][0]) > -1 && son.indexOf(tree[i][0]) > -1) {
-            return false
-        }
-        if (father.indexOf(tree[i][0]) == -1 && son.indexOf(tree[i][0]) > -1) {
-            father.push(tree[i][0])
-        }
-    }
-    for (let i = 1; i < tree.length; i++) {
-        if (father.indexOf(tree[i][1]) > -1 && son.indexOf(tree[i][0]) > -1) {
-            return false
-        }
-    }
-    // console.log(son)
-    // console.log(father)
-    return true;
-}
 class node {
     name: string
     sons: node[]
@@ -66,37 +31,43 @@ class node {
         this.sons = []
     }
 
-    findNode(searchName: string): node|undefined {
+    findNode(searchName: string): node | undefined {
         if (this.name == searchName) {
             return this
         } else {
             for (let s of this.sons) {
-                return s.findNode(searchName)
+                let n = s.findNode(searchName)
+                if (n) {
+                    return n
+                }
             }
         }
         return undefined
     }
-    
-    addSon(father: string, son: string): boolean {
-        console.log(this.name, father, son)
-        let sonnode = new node(son)
+
+    addNode(father: string, son: string): node | undefined {
         if (this.name == son) {
-            return false
-        }
-        if (this.name == father) {
-            this.sons.push(sonnode)
-            return true
+            let fathernode = new node(father)
+            fathernode.sons.push(this)
+            return fathernode
         } else {
-            for (let c of this.sons) {
-                if (c.name == father) {
-                    c.sons.push(sonnode)
-                    return true
-                } else {
-                    return c.addSon(father, son)
-                }
+            let s = this.addSon(father, son)
+            if (s == undefined) {
+                return undefined
+            } else {
+                return this
             }
         }
-        return false
+    }
+
+    addSon(father: string, son: string): node | undefined {
+        let n = this.findNode(father)
+        if (n == undefined) {
+            return n
+        }
+        let newNode = new node(son)
+        n.sons.push(newNode)
+        return n
     }
 
     addFather(father: string, sonnode: node): node {
@@ -128,48 +99,70 @@ function containsDuplicates(array: string[]) {
     return false;
 }
 
-function isFamily(tree: [string, string][]): boolean {
-    let root: node = new node(tree[0][0])
-    root.addSon(tree[0][0], tree[0][1])
-
-    for (let i = 1; i < tree.length; i++) {
-        // if the child is the root father add to front
-        if (root.name == tree[i][1]) {
-            root = root.addFather(tree[i][0], root)
+function addNodes(tree: string[][], root: node): { newRoot: node, isGood: boolean } {
+    let notFoundList: string[][] = []
+    let foundOne: boolean = false
+    for (let i = 0; i < tree.length; i++) {
+        // console.log('adding', tree[i][0], tree[i][1])
+        let nr = root.addNode(tree[i][0], tree[i][1])
+        if (nr != undefined) {
+            foundOne = true
+            root = nr
         } else {
-            if (!root.addSon(tree[i][0], tree[i][1])) {
-                root.printTree("")
-                return false
-            }
+            notFoundList.push(tree[i])
         }
     }
+    if (!foundOne && notFoundList.length > 0) {
+        return { newRoot: root, isGood: false }
+    }
+    if (notFoundList.length > 0) {
+        return addNodes(notFoundList, root)
+    }
+    return { newRoot: root, isGood: true }
+}
+
+function isFamily(tree: [string, string][]): boolean {
+    if (!tree || tree.length == 0) {
+        return false
+    }
+    let root: node = new node(tree[0][0])
+
+    let { newRoot, isGood } = addNodes(tree, root)
+    if (!isGood) {
+        return isGood
+    }
+
     let names: string[] = []
-    root.flatten(names)
+    newRoot.flatten(names)
     if (containsDuplicates(names)) {
         return false
     }
-    root.printTree("")
-    return true
+
+    return isGood
 }
 
 console.log("Example:");
 console.log(
     isFamily([
-        // ["Logan", "Mike"], 
-        // ["Alexander", "Jack"], 
-        // ["Jack", "Logan"]
+            ["Logan", "Mike"],
+            ["Logan", "Jack"],
+            ["Mike", "Logan"],
+
+        // ["Logan", "Mike"],
+        // ["Alexander", "Jack"],
+        // ["Jack", "Logan"],
 
         // ["Logan", "William"],
         // ["Logan", "Jack"],
         // ["Mike", "Alexander"],
 
-        ["Logan", "William"],
-        ["Logan", "Jack"],
-        ["Jack", "Alexander"],
+        // ["Logan", "William"],
+        // ["Logan", "Jack"],
+        // ["Jack", "Alexander"],
     ]))
 
 // These "asserts" are used for self-checking
-if (false) {
+if (true) {
     assert.strictEqual(isFamily([["Logan", "Mike"]]), true);
     assert.strictEqual(
         isFamily([
