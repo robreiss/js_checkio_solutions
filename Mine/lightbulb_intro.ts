@@ -18,10 +18,13 @@
 import assert from "assert";
 
 function sumLight(els: Date[]): number {
-    // how long the light bulb has been turned on
-
-    // your code here
-    return 0;
+    let total = 0
+    for(let i=0;i<els.length; i=i+2) {
+        let start = Math.floor(els[i].getTime() / 1000)
+        let end = Math.floor(els[i+1].getTime() / 1000)
+        total += end-start
+    }
+    return total;
 }
 
 console.log("Example:");
@@ -34,6 +37,7 @@ console.log(
     ])
 );
 
+if (true) {
 assert.equal(
     sumLight([
         new Date(2015, 1, 12, 10, 0, 0),
@@ -71,7 +75,7 @@ assert.equal(
     ]),
     1
 );
-
+}
 console.log(
     "The first mission in series is completed? Click 'Check' to earn cool rewards!"
 );
