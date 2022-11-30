@@ -19,36 +19,26 @@ import assert from "assert";
 
 function sumLight(els: Date[], startWatching?: Date, endWatching?: Date): number {
     let total = 0
-    let startWatch = 0
-    let endWatch = els[els.length - 1].getTime()
-    if (startWatching) {
-        startWatch = startWatching.getTime()
+
+    startWatching = startWatching || els[0]
+    endWatching = endWatching || els[els.length - 1]
+
+    if (els.length % 2 === 1) {
+        els.push(endWatching)
     }
-    if (endWatching) {
-        endWatch = endWatching.getTime()
-    }
+
+    const min = (a: Date, b: Date) => a > b ? b : a
+    const max = (a: Date, b: Date) => a > b ? a : b
+
     for (let i = 0; i < els.length; i = i + 2) {
-        let start = els[i].getTime()
-        let end =  els[els.length - 1].getTime()
-        if (i < els.length - 1) {
-            end = els[i + 1].getTime()
-        } else {
-            end = endWatch
-        }
-        if (startWatch > start) {
-            start = startWatch
-        }
-        if (startWatch > end) {
-            end = startWatch
-        }
-        if (endWatch < end) {
-            end = endWatch
-        }
-        if (endWatch < start) {
-            end = start
-        }
-        total += end - start
-        console.log('start',start, 'end', end,'total', total / 1000)
+        let start = max(els[i], startWatching)
+        let end = min(els[i + 1], endWatching)
+
+        let diff = end.getTime() - start.getTime()
+        diff = diff > 0 ? diff : 0
+        total += diff
+
+        // console.log('start', start, 'end', end, 'total', total / 1000)
     }
     return total / 1000;
 }
@@ -82,7 +72,7 @@ console.log(
     // !!1220
 );
 
-if (false) {
+if (true) {
     assert.equal(
         sumLight(
             [new Date(2015, 1, 12, 10, 0, 0), new Date(2015, 1, 12, 10, 0, 10)],
