@@ -18,58 +18,78 @@
 const util = require('util');
 import assert from "assert";
 
-function fixDates(elms: Array<[Date, number]>, operating: number): Array<[Date, number]> {
-    operating = operating * 1000
+function getSeconds(date: Date): number {
+    return Math.floor(date.getTime() / 1000)
+}
+
+function fixDates(
+    elms: Array<[Date, number]>,
+    operating: number,
+    endWatching: Date,
+    startWatching: Date
+): Array<[Date, number]> {
+    // sort the element group by date
     elms = elms.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
+
+    elms = elms.map((value) => {
+        if (value[0].getTime() > endWatching.getTime()) {
+            value[0] = endWatching
+        }
+        if (value[0].getTime() < startWatching.getTime()) {
+            value[0] = startWatching
+        }
+        return value
+    })
+    if (elms.length % 2 === 1) {
+        let entry: [Date, number] = [new Date(endWatching), elms[0][1]]
+        elms.push(entry)
+    }
+
     let result: Array<[Date, number]> = []
-    let isOff = true
-    let startTime: Date = new Date()
+    let isOn = false
+    let startDate: Date = new Date()
     let sumTime = 0
+
     for (let i = 0; i < elms.length; i++) {
         let [lightDate, lightNum] = elms[i]
-        console.log(lightDate, lightNum)
-        if (isOff && i === elms.length - 1) {
-            if (sumTime < operating) {
-                startTime = lightDate
-                let time = operating - sumTime
-                if (time < 0) {
-                    time = operating
-                }
-                result.push(elms[i])
-                let entry: [Date, number] = [new Date(startTime.getTime() + time), lightNum]
-                console.log('new entry', startTime, time, entry)
-                result.push(entry)
-                return result
-            }
+        if (!isOn) {
+            isOn = true
+            startDate = lightDate
+            result.push(elms[i])
         } else {
-            if (isOff) {
-                isOff = false
-                startTime = lightDate
-                result.push(elms[i])
-            } else {
-                isOff = true
-                if (sumTime > operating) {
-                    let entry: [Date, number] = [startTime, lightNum]
-                    result.push(entry)
-                    console.log('off-edit-0', entry)
-                } else {
-                    let time = lightDate.getTime() - startTime.getTime()
-                    sumTime += time
-                    let entry: [Date, number]
-                    // console.log(sumTime, time, operating)
-                    if (sumTime > operating) {
-                        entry = [new Date(startTime.getTime() + operating), lightNum]
-                    } else {
-                        entry = [new Date(startTime.getTime() + time), lightNum]
-                    }
-                    result.push(entry)
-                    console.log('off-edit', entry)
-                }
-            }
+            isOn = false
+
+            let opLeft = operating - sumTime
+            opLeft = opLeft < 0 ? 0 : opLeft
+
+            let onTime = lightDate.getTime() - startDate.getTime()
+            onTime = opLeft < onTime ? opLeft : onTime
+
+            let entry: [Date, number] = [new Date(startDate.getTime() + onTime), lightNum]
+            result.push(entry)
+
+            sumTime += onTime
         }
     }
     return result
 }
+
+function groupBy<T>(list: Array<T>, keyGetter: (e: T) => number | string): Map<number | string, Array<T>> {
+    const map = new Map();
+    for (let item of list) {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    }
+    return map;
+}
+
+const MinDate = new Date(1970, 0, 1)
+const MaxDate = new Date(9999, 11, 31)
 
 function sumLight(
     els: Array<Date | [Date, number]>,
@@ -78,14 +98,12 @@ function sumLight(
     operating?: number,
     req?: number
 ): number {
-    return 0;
-}
 
-function sumLightOp(
-    els: Array<Date | [Date, number]>,
-    startWatching?: Date,
-    endWatching?: Date,
-    operating?: number): number {
+    // normalize inputs
+    startWatching = startWatching ?? MinDate
+    endWatching = endWatching ?? MaxDate
+    operating = (operating ?? Infinity) * 1000
+    req = req ?? 1
 
     let elsf: Array<[Date, number]> = els.map((v: Date | [Date, number]) => {
         if (util.isDate(v)) {
@@ -95,94 +113,41 @@ function sumLightOp(
         }
     })
 
-    function groupBy<T>(list: Array<T>, keyGetter: (e: T) => number | string): Map<number | string, Array<T>> {
-        const map = new Map();
-        for (let item of list) {
-            const key = keyGetter(item);
-            const collection = map.get(key);
-            if (!collection) {
-                map.set(key, [item]);
-            } else {
-                collection.push(item);
-            }
-        }
-        return map;
+    let m = groupBy(elsf, (e) => { return e[1] })
+    let result: Array<[Date, number]> = []
+    for (let n of m) {
+        let x = fixDates(n[1], operating, endWatching, startWatching)
+        result = result.concat(x)
     }
 
-    if (operating) {
-        let m = groupBy(elsf, (e) => { return e[1] })
-        let result: Array<[Date, number]> = []
-        for (let n of m) {
-            let x = fixDates(n[1], operating)
-            // console.log(n[1])
-            // console.log(x)
-            result = result.concat(x)
-        }
+    result = result.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
 
-        result = result.sort((a, b) => {
-            return a[0].getTime() - b[0].getTime()
-        })
-        els = result
-        console.log(result)
-    }
-    return sumLightOld(els, startWatching, endWatching)
+    return sumMultiLight(result)
 }
 
-function sumLightOld(els: Array<Date | [Date, number]>, startWatching?: Date, endWatching?: Date): number {
+function sumMultiLight(els: Array<[Date, number]>): number {
+    let m: Map<number, number> = new Map<number, number>()
     let total = 0
+    let onTime = 0
 
-    let elsf: Array<[Date, number]> = els.map((v: Date | [Date, number]) => {
-        if (util.isDate(v)) {
-            return <[Date, number]>[v, 0]
-        } else {
-            return <[Date, number]>v
-        }
-    })
-    elsf = elsf.sort((a, b) => {
-        return a[0].getTime() - b[0].getTime()
-    })
-    // console.log(elsf)
-
-    const min = (a: Date, b: Date) => a > b ? b : a
-    const max = (a: Date, b: Date) => a > b ? a : b
-
-    let startWatch: Date = startWatching || elsf[0][0]
-    let endWatch: Date = endWatching || elsf[els.length - 1][0]
-
-    let m: Map<number, Date> = new Map<number, Date>()
-    let onDate = startWatch
-    let offDate = endWatch
-
-    for (let i = 0; i < elsf.length; i++) {
-        let [lightDate, lightNum] = elsf[i]
+    for (let i = 0; i < els.length; i++) {
+        let [lightTime, lightNum] = [els[i][0].getTime()/1000, els[i][1]]
 
         if (m.has(lightNum)) {
-            // console.log('removing', lightNum, lightDate, m.size)
+            // change change the size check to be m.size < x
             if (m.size === 1) {
-                offDate = min(lightDate, endWatch)
-                let diff = offDate.getTime() - onDate.getTime()
-                diff = diff > 0 ? diff : 0
-                // console.log('diff', diff)
-                total += diff
+                total += lightTime - onTime
             }
             m.delete(lightNum)
         } else {
-            // console.log('adding', lightNum, lightDate, m.size)
+            // change change the size check to be m.size > x
             if (m.size === 0) {
-                onDate = max(lightDate, startWatch)
+                onTime = lightTime
             }
-            m.set(lightNum, lightDate)
-        }
-        // if we hit the end of the data turn light off
-        if (i === elsf.length - 1 && m.size > 0) {
-            offDate = endWatch
-            let diff = offDate.getTime() - onDate.getTime()
-            diff = diff > 0 ? diff : 0
-            // console.log('diff special', diff)
-            total += diff
+            m.set(lightNum, 0)
         }
     }
-    return total / 1000
+    return total 
 }
 
 console.log("Example:");
