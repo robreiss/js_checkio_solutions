@@ -20,49 +20,53 @@
 const util = require('util');
 import assert from "assert";
 
+function getSeconds(date: Date): number {
+    return Math.floor(date.getTime() / 1000)
+}
+
 function fixDates(elms: Array<[Date, number]>, operating: number): Array<[Date, number]> {
     operating = operating * 1000
     elms = elms.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
     let result: Array<[Date, number]> = []
     let isOff = true
-    let startTime: Date = new Date()
+    let startDate: Date = new Date()
     let sumTime = 0
     for (let i = 0; i < elms.length; i++) {
         let [lightDate, lightNum] = elms[i]
         console.log(lightDate, lightNum)
         if (isOff && i === elms.length - 1) {
             if (sumTime < operating) {
-                startTime = lightDate
+                startDate = lightDate
                 let time = operating - sumTime
                 if (time < 0) {
                     time = operating
                 }
                 result.push(elms[i])
-                let entry: [Date, number] = [new Date(startTime.getTime() + time), lightNum]
-                console.log('new entry', startTime, time, entry)
+                let entry: [Date, number] = [new Date(startDate.getTime() + time), lightNum]
+                console.log('new entry', startDate, time, entry)
                 result.push(entry)
                 return result
             }
         } else {
             if (isOff) {
                 isOff = false
-                startTime = lightDate
+                startDate = lightDate
                 result.push(elms[i])
             } else {
                 isOff = true
                 if (sumTime > operating) {
-                    let entry: [Date, number] = [startTime, lightNum]
+                    let entry: [Date, number] = [startDate, lightNum]
                     result.push(entry)
                     console.log('off-edit-0', entry)
                 } else {
-                    let time = lightDate.getTime() - startTime.getTime()
+                    let time = lightDate.getTime() - startDate.getTime()
                     sumTime += time
                     let entry: [Date, number]
                     // console.log(sumTime, time, operating)
                     if (sumTime > operating) {
-                        entry = [new Date(startTime.getTime() + operating), lightNum]
+                        entry = [new Date(startDate.getTime() + operating), lightNum]
                     } else {
-                        entry = [new Date(startTime.getTime() + time), lightNum]
+                        entry = [new Date(startDate.getTime() + time), lightNum]
                     }
                     result.push(entry)
                     console.log('off-edit', entry)
@@ -78,6 +82,10 @@ function sumLight(
     startWatching?: Date,
     endWatching?: Date,
     operating?: number): number {
+
+    // if (operating === undefined) {
+    //     operating = Number.MAX_SAFE_INTEGER
+    // }
 
     let elsf: Array<[Date, number]> = els.map((v: Date | [Date, number]) => {
         if (util.isDate(v)) {

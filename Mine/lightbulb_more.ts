@@ -15,27 +15,6 @@
 // The array of pressing the button is always sorted in ascending order.The array of pressing the button has no repeated elements.The minimum possible date is 1970-01-01The maximum possible date is 9999-12-31req arguments is positive and non-zero
 // END_DESC
 
-# Taken from mission Lightbulb Operating
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const util = require('util');
 import assert from "assert";
 
@@ -96,6 +75,16 @@ function sumLight(
     els: Array<Date | [Date, number]>,
     startWatching?: Date,
     endWatching?: Date,
+    operating?: number,
+    req?: number
+): number {
+    return 0;
+}
+
+function sumLightOp(
+    els: Array<Date | [Date, number]>,
+    startWatching?: Date,
+    endWatching?: Date,
     operating?: number): number {
 
     let elsf: Array<[Date, number]> = els.map((v: Date | [Date, number]) => {
@@ -138,18 +127,6 @@ function sumLight(
     }
     return sumLightOld(els, startWatching, endWatching)
 }
-
-console.log("Example:");
-console.log(sumLight([
-    [new Date(2015, 1, 12, 10, 0, 10), 3],
-    new Date(2015, 1, 12, 10, 0, 20),
-    [new Date(2015, 1, 12, 10, 0, 15), 3],
-    [new Date(2015, 1, 12, 10, 0, 30), 2],
-    new Date(2015, 1, 12, 10, 0, 40),
-    [new Date(2015, 1, 12, 10, 0, 50), 2],
-    [new Date(2015, 1, 12, 10, 1, 0), 3],
-    [new Date(2015, 1, 12, 10, 0, 17), 3],
-], undefined, undefined, 10));
 
 function sumLightOld(els: Array<Date | [Date, number]>, startWatching?: Date, endWatching?: Date): number {
     let total = 0
@@ -208,287 +185,6 @@ function sumLightOld(els: Array<Date | [Date, number]>, startWatching?: Date, en
     return total / 1000
 }
 
-if (true) {
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ]), 60);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 11, 0, 0), 2],
-        [new Date(2015, 1, 12, 11, 1, 0), 2],
-    ]), 70);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ]), 30);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ]), 40);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 3],
-        [new Date(2015, 1, 12, 10, 1, 20), 3],
-    ]), 60);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], new Date(2015, 1, 12, 10, 0, 50)), 10);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 30)), 20);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20)), 30);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10)), 30);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 50)), 0);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 30)), 20);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20)), 30);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-        [new Date(2015, 1, 12, 10, 1, 20), 2],
-        [new Date(2015, 1, 12, 10, 1, 40), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20)), 50);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], new Date(2015, 1, 12, 10, 0, 30), new Date(2015, 1, 12, 10, 1, 0)), 30);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20), new Date(2015, 1, 12, 10, 1, 0)), 40);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-    ], new Date(2015, 1, 12, 10, 0, 0), new Date(2015, 1, 12, 10, 0, 30)), 30);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 0), new Date(2015, 1, 12, 10, 1, 0)), 40);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 0), new Date(2015, 1, 12, 10, 0, 10)), 0);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 20)), 10);
-
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 20)), 10);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 30)), 20);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 11, 0, 0, 0), 3],
-        new Date(2015, 1, 12, 0, 0, 0),
-        [new Date(2015, 1, 13, 0, 0, 0), 3],
-        [new Date(2015, 1, 13, 0, 0, 0), 2],
-        new Date(2015, 1, 14, 0, 0, 0),
-        [new Date(2015, 1, 15, 0, 0, 0), 2],
-    ], new Date(2015, 1, 10, 0, 0, 0), new Date(2015, 1, 16, 0, 0, 0)), 345600);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-    ], undefined, undefined, 100), 10);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-    ], undefined, undefined, 5), 5);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 10),
-        [new Date(2015, 1, 12, 10, 0, 0), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], undefined, undefined, 100), 60);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 30),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], undefined, undefined, 100), 60);
-
-    assert.equal(sumLight([
-        new Date(2015, 1, 12, 10, 0, 0),
-        new Date(2015, 1, 12, 10, 0, 30),
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 2],
-    ], undefined, undefined, 20), 40);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-        [new Date(2015, 1, 12, 10, 1, 0), 3],
-        [new Date(2015, 1, 12, 10, 1, 20), 3],
-    ], undefined, undefined, 10), 30);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-        [new Date(2015, 1, 12, 10, 1, 20), 2],
-        [new Date(2015, 1, 12, 10, 1, 40), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20), undefined, 100), 50);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-        new Date(2015, 1, 12, 10, 0, 40),
-        [new Date(2015, 1, 12, 10, 0, 50), 2],
-        [new Date(2015, 1, 12, 10, 1, 20), 2],
-        [new Date(2015, 1, 12, 10, 1, 40), 2],
-    ], new Date(2015, 1, 12, 10, 0, 20), undefined, 10), 20);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 30),
-        20), 20);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 30),
-        10), 20);
-
-    assert.equal(sumLight([
-        [new Date(2015, 1, 12, 10, 0, 10), 3],
-        new Date(2015, 1, 12, 10, 0, 20),
-        [new Date(2015, 1, 12, 10, 0, 30), 3],
-        [new Date(2015, 1, 12, 10, 0, 30), 2],
-    ], new Date(2015, 1, 12, 10, 0, 10), new Date(2015, 1, 12, 10, 0, 30),
-        5), 10);
-
-    console.log("The forth mission in series is completed? Click 'Check' to earn cool rewards!")
-}
-
-import assert from "assert";
-
-function sumLight(
-    els: Array<Date | [Date, number]>,
-    startWatching?: Date,
-    endWatching?: Date,
-    operating?: number,
-    req?: number
-): number {
-    // how long the light bulb has been turned on
-    return 0;
-}
-
 console.log("Example:");
 console.log(
     sumLight(
@@ -507,6 +203,7 @@ console.log(
     )
 );
 
+if (false) {
 assert.equal(
     sumLight([
         new Date(2015, 1, 12, 10, 0, 0),
@@ -1181,3 +878,4 @@ assert.equal(
 console.log(
     "The forth mission in series is completed? Click 'Check' to earn cool rewards!"
 );
+}
