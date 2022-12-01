@@ -25,11 +25,11 @@ function getSeconds(date: Date): number {
 }
 
 function fixDates(
-    elms: Array<[Date, number]>, 
-    operating: number, 
+    elms: Array<[Date, number]>,
+    operating: number,
     endWatching: Date,
     startWatching: Date
-    ): Array<[Date, number]> {
+): Array<[Date, number]> {
     // sort the element group by date
     elms = elms.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
 
@@ -90,6 +90,9 @@ function groupBy<T>(list: Array<T>, keyGetter: (e: T) => number | string): Map<n
     return map;
 }
 
+const MinDate = new Date(1970, 0, 1)
+const MaxDate = new Date(9999, 11, 31)
+
 function sumLight(
     els: Array<Date | [Date, number]>,
     startWatching?: Date,
@@ -97,8 +100,6 @@ function sumLight(
     operating?: number): number {
 
     // normalize inputs
-    const MinDate = new Date(1970, 0, 1)
-    const MaxDate = new Date(9999, 11, 31)
     startWatching = startWatching ?? MinDate
     endWatching = endWatching ?? MaxDate
     operating = (operating ?? Infinity) * 1000
@@ -120,66 +121,43 @@ function sumLight(
 
     result = result.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
 
-    return sumLightOld(result, startWatching, endWatching)
+    return sumMultiLight(result)
 }
 
 console.log("Example:");
 console.log(sumLight([
     [new Date(2015, 1, 12, 10, 0, 10), 3],
-    // new Date(2015, 1, 12, 10, 0, 20),
+    new Date(2015, 1, 12, 10, 0, 20),
     [new Date(2015, 1, 12, 10, 0, 15), 3],
-    // [new Date(2015, 1, 12, 10, 0, 30), 2],
-    // new Date(2015, 1, 12, 10, 0, 40),
-    // [new Date(2015, 1, 12, 10, 0, 50), 2],
+    [new Date(2015, 1, 12, 10, 0, 30), 2],
+    new Date(2015, 1, 12, 10, 0, 40),
+    [new Date(2015, 1, 12, 10, 0, 50), 2],
     [new Date(2015, 1, 12, 10, 1, 0), 3],
     [new Date(2015, 1, 12, 10, 0, 17), 3],
     [new Date(2015, 1, 12, 10, 4, 17), 3],
 ], undefined, undefined, 10));
 
-function sumLightOld(els: Array<[Date, number]>, 
-    startWatching?: Date, endWatching?: Date): number {
+function sumMultiLight(els: Array<[Date, number]>): number {
+    let m: Map<number, number> = new Map<number, number>()
     let total = 0
-
-    const min = (a: Date, b: Date) => a > b ? b : a
-    const max = (a: Date, b: Date) => a > b ? a : b
-
-    let startWatch: Date = startWatching || els[0][0]
-    let endWatch: Date = endWatching || els[els.length - 1][0]
-
-    let m: Map<number, Date> = new Map<number, Date>()
-    let onDate = startWatch
-    let offDate = endWatch
+    let onTime = 0
 
     for (let i = 0; i < els.length; i++) {
-        let [lightDate, lightNum] = els[i]
+        let [lightTime, lightNum] = [els[i][0].getTime()/1000, els[i][1]]
 
         if (m.has(lightNum)) {
-            // console.log('removing', lightNum, lightDate, m.size)
             if (m.size === 1) {
-                offDate = min(lightDate, endWatch)
-                let diff = offDate.getTime() - onDate.getTime()
-                diff = diff > 0 ? diff : 0
-                // console.log('diff', diff)
-                total += diff
+                total += lightTime - onTime
             }
             m.delete(lightNum)
         } else {
-            // console.log('adding', lightNum, lightDate, m.size)
             if (m.size === 0) {
-                onDate = max(lightDate, startWatch)
+                onTime = lightTime
             }
-            m.set(lightNum, lightDate)
+            m.set(lightNum, 0)
         }
-        // if we hit the end of the data turn light off
-        // if (i === els.length - 1 && m.size > 0) {
-        //     offDate = endWatch
-        //     let diff = offDate.getTime() - onDate.getTime()
-        //     diff = diff > 0 ? diff : 0
-        //     // console.log('diff special', diff)
-        //     total += diff
-        // }
     }
-    return total / 1000
+    return total 
 }
 
 if (true) {
