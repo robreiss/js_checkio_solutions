@@ -146,11 +146,13 @@ function sumMultiLight(els: Array<[Date, number]>): number {
         let [lightTime, lightNum] = [els[i][0].getTime()/1000, els[i][1]]
 
         if (m.has(lightNum)) {
+            // change change the size check to be m.size < x
             if (m.size === 1) {
                 total += lightTime - onTime
             }
             m.delete(lightNum)
         } else {
+            // change change the size check to be m.size > x
             if (m.size === 0) {
                 onTime = lightTime
             }
