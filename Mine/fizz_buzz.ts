@@ -21,8 +21,16 @@
 import assert from "assert";
 
 function fizzBuzz(a: number): string {
-    // your code here
-    return "";
+    if (a % 3 === 0 && a % 5 === 0) {
+        return "Fizz Buzz"
+    }
+    if (a % 3 === 0) {
+        return "Fizz"
+    }
+    if (a % 5 === 0) {
+        return "Buzz"
+    }
+    return a.toString();
 }
 
 console.log("Example:");
