@@ -122,10 +122,10 @@ function sumLight(
 
     result = result.sort((a, b) => { return a[0].getTime() - b[0].getTime() })
 
-    return sumMultiLight(result)
+    return sumMultiLight(result, req)
 }
 
-function sumMultiLight(els: Array<[Date, number]>): number {
+function sumMultiLight(els: Array<[Date, number]>, req: number): number {
     let m: Map<number, number> = new Map<number, number>()
     let total = 0
     let onTime = 0
@@ -134,18 +134,17 @@ function sumMultiLight(els: Array<[Date, number]>): number {
         let [lightTime, lightNum] = [els[i][0].getTime()/1000, els[i][1]]
 
         if (m.has(lightNum)) {
-            // change change the size check to be m.size < x
-            if (m.size === 1) {
+            m.delete(lightNum)
+            if (m.size === req - 1) {
                 total += lightTime - onTime
             }
-            m.delete(lightNum)
         } else {
-            // change change the size check to be m.size > x
-            if (m.size === 0) {
+            m.set(lightNum, 0)
+            if (m.size === req) {
                 onTime = lightTime
             }
-            m.set(lightNum, 0)
         }
+        // console.log(onTime, m)
     }
     return total 
 }
@@ -154,21 +153,20 @@ console.log("Example:");
 console.log(
     sumLight(
         [
-            [new Date(2015, 1, 12, 10, 0, 10), 3],
-            new Date(2015, 1, 12, 10, 0, 20),
-            [new Date(2015, 1, 12, 10, 0, 50), 3],
-            [new Date(2015, 1, 12, 10, 0, 30), 2],
-            new Date(2015, 1, 12, 10, 0, 40),
-            [new Date(2015, 1, 12, 10, 0, 50), 2],
+            new Date(2015, 1, 12, 10, 0, 0),
+            [new Date(2015, 1, 12, 10, 0, 0), 2],
+            new Date(2015, 1, 12, 10, 0, 10),
+            [new Date(2015, 1, 12, 10, 1, 0), 2],
         ],
         undefined,
         undefined,
         undefined,
-        3
-    )
+        2
+    ),
+    10
 );
 
-if (false) {
+if (true) {
 assert.equal(
     sumLight([
         new Date(2015, 1, 12, 10, 0, 0),
