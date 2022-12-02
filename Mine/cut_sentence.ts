@@ -20,8 +20,27 @@
 
 import assert from "assert";
 
+function isLetter(c: string): boolean {
+    return c.toLowerCase() !== c.toUpperCase()
+}
+
 function cutSentence(line: string, length: number): string {
-    // your code here
+    
+    let buffer = ""
+    let result = ""
+    for(let i = 0; i< line.length;i++){
+        let c = line[i]
+        if (i > length) {
+            return result.trim() + "..."
+        }
+        if (isLetter(c)) {
+            buffer += c
+        } else {
+            result += buffer
+            buffer = ""
+            result += c
+        }
+    }
     return line;
 }
 
