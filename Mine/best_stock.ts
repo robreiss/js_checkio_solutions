@@ -14,8 +14,12 @@
 import assert from "assert";
 
 function bestStock(data: object): string {
-    // your code here
-    return "";
+    let dataarr: Array<[string, number]> = Object.keys(data).map((key) => {
+        return [key, data[key as keyof typeof data]]
+    })
+    dataarr.sort((a,b) => { return b[1] - a[1]})
+    // console.log(dataarr)
+    return dataarr[0][0]
 }
 
 console.log("Example:");
