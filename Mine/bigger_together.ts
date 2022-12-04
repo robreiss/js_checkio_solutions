@@ -16,13 +16,51 @@
 
 import assert from "assert";
 
+// function permute(nums: number[]): number[][] {
+//     let result: number[][] = [];
+//     if (nums.length === 0) return [];
+//     if (nums.length === 1) return [nums];
+//     for (let i = 0; i < nums.length; i++) {
+//         const currentNum = nums[i];
+//         const remainingNums = nums.slice(0, i).concat(nums.slice(i + 1));
+//         const remainingNumsPermuted = permute(remainingNums);
+//         for (let j = 0; j < remainingNumsPermuted.length; j++) {
+//             const permutedArray = [currentNum].concat(remainingNumsPermuted[j]);
+//             result.push(permutedArray);
+//         }
+//     }
+//     return result;
+// }
+
+function compareSpecial(a: number, b: number): number {
+    let astr = a.toString()
+    let bstr = b.toString()
+    return Number(bstr + astr) - Number(astr + bstr)
+}
+
 function biggerTogether(a: number[]): number {
-    // your code here
-    return 0;
+    let bigArr = a.sort((a, b) => {
+        return compareSpecial(a,b)
+    })
+    let bigNum = Number(bigArr.join(''))
+
+    let smallArr = a.sort((a, b) => {
+        return compareSpecial(b,a)
+    })
+    let smallNum = Number(smallArr.join(''))
+
+    return bigNum - smallNum
 }
 
 console.log('Example:');
-console.log(biggerTogether([1, 2, 3, 4]));
+// console.log(biggerTogether([1, 2, 3, 4]));
+// console.log(biggerTogether([1, 2, 3, 4, 11, 12]), 32099877)
+// console.log(biggerTogether([1, 2, 3]), '321')
+// console.log(biggerTogether([11, 2, 3]), '3211')
+// console.log(biggerTogether([20, 1, 2, 3]), '31421')
+// console.log(biggerTogether([14, 1, 6, 3]), '31614')
+// console.log(biggerTogether([420, 42, 423]),381078)
+console.log(biggerTogether([31, 3132]), 99)
 
 // These "asserts" are used for self-checking
 assert.equal(biggerTogether([1, 2, 3, 4]), 3087);
