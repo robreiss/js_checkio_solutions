@@ -30,58 +30,56 @@ function calcdist(speed: number[]) {
     }, 0)
 }
 
-function dec(speed: number[], maxdist: number, end: number) {
+function dec(speed: number[], maxdist: number, nowlimit: number, nextlimit: number) {
     let dist = calcdist(speed)
-    // while (dist > maxdist || speed[speed.length - 1] > end) {
-    while (speed[speed.length - 1] > end) {
-        for (let i = speed.length - 1; i > 0; i--) {
-            if (speed[i] >= speed[i - 1]) {
-                speed[i] = speed[i] - 1
-                break
+    let uselimit = nowlimit
+    if (dist > maxdist) {
+        uselimit = nextlimit < nowlimit ? nextlimit : nowlimit
+    }
+    let loop = 0
+    while ((speed[speed.length - 1] > uselimit || dist < maxdist) && loop++ < 25) {
+        if (dist < maxdist) {
+            let next = speed[speed.length - 1] + 1
+            // next = next > uselimit ? uselimit : next
+            speed.push(next)
+            console.log('push', next)
+        } else {
+            for (let i = speed.length - 1; i > 0; i--) {
+                if (speed[i] >= speed[i - 1] && speed[i] > 1) {
+                    speed[i] = speed[i] - 1
+                    break
+                }
             }
+            console.log('reduce')
         }
         dist = calcdist(speed)
-    }
-}
-
-function acc(speed: number[], maxdist: number, limit: number, end: number) {
-    let i = speed[speed.length - 1] || 1
-    let dist = 0
-    while (dist < maxdist) {
-        speed.push(i)
-        if (i < limit) {
-            i++
+        uselimit = nowlimit
+        if (dist > maxdist) {
+            uselimit = nextlimit < nowlimit ? nextlimit : nowlimit
         }
-        dist = calcdist(speed)
+        console.log(speed, maxdist, dist, uselimit, nowlimit, nextlimit)
     }
-    console.log(speed)
+    // console.log(speed, maxdist, dist, end)
 }
 
 function fastTrain(sections: [number, number][]): number {
-    let limit: number[] = []
     let speed: number[] = []
-    // for (let i = 0; i < sections.length; i++) {
-    //     let sec: [number, number] = sections[i]
-    //     // limit.push(new Array(sec[0]).fill(sec[1]))
-    //     for (let j = 0; j < sec[0]; j++) {
-    //         limit.push(sec[1])
-    //     }
-    // }
+    speed.push(1)
+    sections.push([0, 1])
     console.log(sections)
-    // console.log(limit)
-
-    sections.push([0,1])
     let totaldist = 0
-    for (let i = 0; i < sections.length - 1; i++) {
+    for (let i = 0; i < sections.length; i++) {
         let [dist, limit] = sections[i]
+        console.log(sections[i])
         totaldist += dist
-        let end = sections[i+1][1]
-        acc(speed, totaldist, limit, end)
-        console.log(speed, dist, limit)
-        dec(speed, totaldist, end)
-        console.log(speed, dist, end)
+        let nextlimit = 1
+        if (i < sections.length - 1) {
+            nextlimit = sections[i + 1][1]
+        }
+        console.log(speed, totaldist, limit, nextlimit)
+        dec(speed, totaldist, limit, nextlimit)
     }
-    return 0;
+    return speed.length;
 }
 
 console.log('Example:');
@@ -89,11 +87,16 @@ console.log('Example:');
 // console.log(fastTrain([[5, 5], [4, 2], [6, 3]]), 8);
 // console.log(fastTrain([[9, 7]]), 5);
 // console.log(fastTrain([[19, 8]]), 5);
-console.log(fastTrain([[5, 5], [4, 4]]), 6);
+console.log(fastTrain([[8, 3], [1, 1], [8, 3]]), 9)
+// console.log(fastTrain([[5, 5], [4, 2]]), 6);
+// console.log(fastTrain([[10, 5], [2, 5], [3, 5]]), 7)
 // These "asserts" are used for self-checking
-// assert.equal(fastTrain([[4, 3]]), 3);
-// assert.equal(fastTrain([[9, 7]]), 5);
-// assert.equal(fastTrain([[5, 5], [4, 2]]), 6);
-// assert.equal(fastTrain([[5, 5], [4, 2], [6, 3]]), 8);
+assert.equal(fastTrain([[4, 3]]), 3);
+assert.equal(fastTrain([[9, 7]]), 5);
+assert.equal(fastTrain([[5, 5], [4, 2]]), 6);
+assert.equal(fastTrain([[5, 5], [4, 2], [6, 3]]), 8);
+assert.equal(fastTrain([[8, 3], [1, 1], [8, 3]]), 9)
+assert.equal(fastTrain([[5, 5], [4, 2]]), 6);
+assert.equal(fastTrain([[10, 5], [2, 5], [3, 5]]), 7)
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
