@@ -34,10 +34,13 @@
 
 import assert from "assert";
 
-export class Point {
-    constructor(public x: number, public y: number) { }
-}
-
+// The classes Hex and OffsetCoord were copied from 
+// https://www.redblobgames.com/grids/hexagons
+// Amit Patel does a fantastic job of explaining using 
+// a three coordinate system to describe a hex map.
+// I had attempted to do the problem not using a three
+// coordinate system but my simplistic rotations failed
+// the more complex cases.
 export class Hex {
     constructor(public q: number, public r: number, public s: number) {
         if (Math.round(q + r + s) !== 0) throw "q + r + s must be 0";
@@ -133,18 +136,6 @@ export class Hex {
         return results;
     }
 
-    public dir(): string {
-        if (this.s > 0 && this.r < 0) {
-            return 'F'
-        } else if (this.s < 0 && this.r > 0) {
-            return 'B'
-        } else if (this.s <= 0 && this.r <= 0) {
-            return 'R'
-        } else if (this.s >= 0 && this.r >= 0) {
-            return 'L'
-        }
-        throw 'bad direction'
-    }
 }
 
 export class OffsetCoord {
@@ -195,7 +186,9 @@ export class OffsetCoord {
 
 }
 
-const dmap = new Map<string, number>([
+// map compase directions to number of
+// 60 degree rotations needed
+const rotateMap = new Map<string, number>([
     ["N", 0],
     ["NE", 1],
     ["SE", 2],
@@ -204,172 +197,53 @@ const dmap = new Map<string, number>([
     ["NW", 5],
 ])
 
+// Finding the realive direction using a three coordinate 
+// system is easy
+function relativeDir(a: Hex): string {
+    if (a.s > 0 && a.r < 0) {
+        return 'F'
+    } else if (a.s < 0 && a.r > 0) {
+        return 'B'
+    } else if (a.s <= 0 && a.r <= 0) {
+        return 'R'
+    } else if (a.s >= 0 && a.r >= 0) {
+        return 'L'
+    }
+    throw 'bad direction'
+}
+
 function findEnemy(you: string, dir: string, enemy: string): [string, number] {
     let [yletter, ynumber] = you.split("")
     let [eletter, enumber] = enemy.split("")
+
+    // convert to numeric col,row with origin at 0
     let ycol = yletter.charCodeAt(0) - 'A'.charCodeAt(0)
     let yrow = Number(ynumber) - 1
     let ecol = eletter.charCodeAt(0) - 'A'.charCodeAt(0)
     let erow = Number(enumber) - 1
-    let yh = OffsetCoord.qoffsetToCube(-1, new OffsetCoord(ycol, yrow))
-    let eh = OffsetCoord.qoffsetToCube(-1, new OffsetCoord(ecol, erow))
-    let neweh = eh.subtract(yh)
-    let turns = dmap.get(dir) || 0
-    for (let i = 0; i < turns; i++) {
-        neweh = neweh.rotateLeft()
+
+    // Convert from col,row coordinates to three q,s,r coordinates
+    let youhex = OffsetCoord.qoffsetToCube(-1, new OffsetCoord(ycol, yrow))
+    let enemyhex = OffsetCoord.qoffsetToCube(-1, new OffsetCoord(ecol, erow))
+
+    // rotate the coordinates
+    // first center the coordinate system
+    let ehexrotated = enemyhex.subtract(youhex)
+    let num60rotations = rotateMap.get(dir) || 0
+    for (let i = 0; i < num60rotations; i++) {
+        ehexrotated = ehexrotated.rotateLeft()
     }
-    neweh = neweh.add(yh)
-    let dist = yh.distance(neweh)
-    let direction = neweh.subtract(yh).dir()
+    // switch back to our original coord system
+    ehexrotated = ehexrotated.add(youhex)
+
+    let dist = youhex.distance(ehexrotated)
+    let direction = relativeDir(ehexrotated.subtract(youhex))
+
     return [direction, dist]
-}
-function findEnemy2(you: string, dir: string, enemy: string): [string, number] {
-    // find direction
-    let [yletter, ynumber] = you.split("")
-    let [eletter, enumber] = enemy.split("")
-    let letterDif = Number(eletter.charCodeAt(0)) - Number(yletter.charCodeAt(0))
-    let numberDif = Number(enumber) - Number(ynumber)
-    let letterAbs = Math.abs(letterDif)
-    let numberAbs = Math.abs(numberDif)
-    let goDir: string = ""
-    let goDist = 0
-    let updown = numberAbs >= letterAbs ? true : false
-    if (updown && numberDif < 0) {
-        goDir = 'N'
-        goDist = numberAbs <= letterAbs ? numberAbs + letterAbs - 1 : numberAbs
-    } else if (updown && numberDif > 0) {
-        goDir = 'S'
-        goDist = numberAbs <= letterAbs ? numberAbs + letterAbs - 1 : numberAbs
-    } else if (letterDif > 0 && numberDif <= 0) {
-        goDir = 'NE'
-        goDist = letterAbs <= numberAbs ? letterAbs + numberAbs - 1 : letterAbs
-    } else if (letterDif > 0 && numberDif > 0) {
-        goDir = 'SE'
-        goDist = letterAbs <= numberAbs ? letterAbs + numberAbs - 1 : letterAbs
-    } else if (letterDif < 0 && numberDif < 0) {
-        goDir = 'NW'
-        goDist = letterAbs <= numberAbs ? letterAbs + numberAbs - 1 : letterAbs
-    } else {
-        goDir = 'SW'
-        goDist = letterAbs <= numberAbs ? letterAbs + numberAbs - 1 : letterAbs
-    }
-
-    let dmap = new Map<string, number>([
-        ["N", 0],
-        ["NE", 1],
-        ["SE", 2],
-        ["S", 3],
-        ["SW", 4],
-        ["NW", 5],
-    ])
-
-    let rmap = new Map<string, number>([
-        ["N", 0],
-        ["NE", 5],
-        ["SE", 4],
-        ["S", 3],
-        ["SW", 2],
-        ["NW", 1],
-    ])
-
-    // N  N F
-    // NE N L
-    // SE N L
-    // S  N B
-    // SW N R
-    // NW N R
-
-    // N  NE R
-    // NE NE F
-    // SE NE L
-    // S  NE L
-    // SW NE B
-    // NW NE R
-
-    // N  SE R
-    // NE SE R
-    // SE SE F
-    // S  SE L
-    // SW SE L
-    // NW SE B
-
-    // N  S B
-    // NE S R
-    // SE S R
-    // S  S F
-    // SW S L
-    // NW S L
-
-    // F 0
-    // R 1
-    // R 2
-    // B 3
-    // L 4
-    // L 5
-
-    // N  N F shift 0
-    // NE N R
-    // SE N R
-    // S  N B
-    // SW N L
-    // NW N L
-
-    // N  NE L shift 5
-    // NE NE F
-    // SE NE R
-    // S  NE R
-    // SW NE B
-    // NW NE L
-
-    // N  SE L shift 4
-    // NE SE L
-    // SE SE F
-    // S  SE R
-    // SW SE R
-    // NW SE B
-
-    // let  zoo = new Map<string, number>([
-    //     ["F", 0],
-    //     ["R", 1],
-    //     ["B", 2],
-    //     ["L", 3],
-    // ])
-
-    let xmap = [
-        "F",
-        "R",
-        "R",
-        "B",
-        "L",
-        "L",
-    ]
-
-    let idx = ((dmap.get(goDir) || 0) + (rmap.get(dir) || 0)) % 6
-    let goStep: string = xmap[idx]
-    if (numberAbs === letterAbs) {
-        goStep = xmap[((dmap.get(goDir) || 0) + 3) % 6]
-    }
-
-    console.log('you', you, 'enemy', enemy, 'ld', letterDif, 'nd', numberDif
-        , 'dir', dir, 'goDir', goDir, 'idx', idx, 'ans', goStep, 'goDist', goDist)
-    return [goStep, goDist];
 }
 
 console.log("Example:");
-// console.log(findEnemy("G3", "NE", "C5"), ["B", 4]);
-// console.log(findEnemy("G5", "N", "G4"), ["F", 1])
-// console.log(findEnemy("G5", "N", "I4"), ["R", 2])
-// console.log(findEnemy("G5", "N", "J6"), ["R", 3])
-// console.log(findEnemy("G5", "N", "G9"), ["B", 4])
-// console.log(findEnemy("G5", "N", "B7"), ["L", 5])
-// console.log(findEnemy("G5", "N", "A2"), ["L", 6])
-// console.log(findEnemy("H3", "SW", "E2"), ["R", 3]);
-// console.log(findEnemy("G3", "NE", "C5"), ["B", 4]);
-// console.log(findEnemy("A4", "S", "M4"), ["L", 12]);
 console.log(findEnemy("C3", "SE", "A1"), ["B", 3])
-console.log(findEnemy("D3", "NE", "A1"), ["L", 4])
-
-// console.log(findEnemy("G5", "N", "I4"), ["R", 2]);  
 
 // These "asserts" are used for self-checking
 assert.deepStrictEqual(findEnemy("G5", "N", "G4"), ["F", 1]);
