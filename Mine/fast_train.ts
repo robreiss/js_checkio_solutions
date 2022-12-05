@@ -31,18 +31,13 @@ function calcdist(speed: number[]) {
 }
 
 function dec(speed: number[], maxdist: number, nowlimit: number, nextlimit: number) {
-    let dist = calcdist(speed)
-    let uselimit = nowlimit
-    if (dist > maxdist) {
-        uselimit = nextlimit < nowlimit ? nextlimit : nowlimit
-    }
-    let loop = 0
-    while ((speed[speed.length - 1] > uselimit || dist < maxdist) && loop++ < 25) {
+    let dist = 0
+    let uselimit = 0
+    do {
+        dist = calcdist(speed)
         if (dist < maxdist) {
             let next = speed[speed.length - 1] + 1
-            // next = next > uselimit ? uselimit : next
             speed.push(next)
-            console.log('push', next)
         } else {
             for (let i = speed.length - 1; i > 0; i--) {
                 if (speed[i] >= speed[i - 1] && speed[i] > 1) {
@@ -50,33 +45,27 @@ function dec(speed: number[], maxdist: number, nowlimit: number, nextlimit: numb
                     break
                 }
             }
-            console.log('reduce')
         }
-        dist = calcdist(speed)
         uselimit = nowlimit
         if (dist > maxdist) {
-            uselimit = nextlimit < nowlimit ? nextlimit : nowlimit
+            uselimit = Math.min(nowlimit, nextlimit)
         }
-        console.log(speed, maxdist, dist, uselimit, nowlimit, nextlimit)
-    }
-    // console.log(speed, maxdist, dist, end)
+        // console.log(speed, maxdist, dist, uselimit, nowlimit, nextlimit)
+    } while ((speed[speed.length - 1] > uselimit || dist < maxdist))
 }
 
 function fastTrain(sections: [number, number][]): number {
     let speed: number[] = []
     speed.push(1)
     sections.push([0, 1])
-    console.log(sections)
     let totaldist = 0
     for (let i = 0; i < sections.length; i++) {
         let [dist, limit] = sections[i]
-        console.log(sections[i])
         totaldist += dist
         let nextlimit = 1
         if (i < sections.length - 1) {
             nextlimit = sections[i + 1][1]
         }
-        console.log(speed, totaldist, limit, nextlimit)
         dec(speed, totaldist, limit, nextlimit)
     }
     return speed.length;
