@@ -20,13 +20,36 @@
 
 import assert from "assert";
 
+function euclidean(a: number, b: number): number {
+    if (a === 0) {
+        return b
+    }
+    if (b === 0) {
+        return a
+    }
+    if (a < b) {
+        let t = b
+        b = a
+        a = t
+    }
+    let q = Math.floor(a/b)
+    let r = a % (q * b)
+    // console.log(a,b,q,r)
+    return euclidean(b, r)
+}
+
 function greatestCommonDivisor(...args: number[]): number {
-    // your code here
-    return 0;
+    let ans = args[0]
+    for(let i =0;i<args.length;i++) {
+        ans = euclidean(ans, args[i] )
+    }
+    return ans;
 }
 
 console.log("Example:");
-console.log(greatestCommonDivisor(6, 4));
+// console.log(greatestCommonDivisor(6, 4));
+console.log(greatestCommonDivisor(4, 6));
+console.log(greatestCommonDivisor(270, 192));
 
 // These "asserts" are used for self-checking
 assert.equal(greatestCommonDivisor(6, 4), 2);
