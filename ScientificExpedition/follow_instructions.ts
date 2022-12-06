@@ -24,8 +24,27 @@
 import assert from "assert";
 
 function follow(instructions: string): [number, number] {
-    // your code here
-    return [0, 0];
+    let c: [number, number] = [0,0]
+    for(let i = 0; i< instructions.length; i++) {
+        let dir = instructions[i]
+        switch (dir) {
+            case 'f':
+                c = [c[0], c[1] + 1]
+                break;
+            case 'b':
+                c = [c[0], c[1] - 1]
+                break;
+            case 'r':
+                c = [c[0] + 1, c[1]]
+                break;
+            case 'l':
+                c = [c[0] - 1, c[1]]
+                break;
+            default:
+                break;
+        }
+    }
+    return c;
 }
 
 console.log("Example:");

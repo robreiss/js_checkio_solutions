@@ -16,8 +16,15 @@
 import assert from "assert";
 
 function checkPangram(text: string): boolean {
-    // your code here
-    return false;
+    let m: Set<string> = new Set()
+    for(let i = 0; i< text.length; i++) {
+        let letter = text[i].toLowerCase()
+        if (/[a-z]/i.test(letter)) {
+            m.add(letter)
+        }
+    }
+    // console.log(m, m.size)
+    return m.size === 26;
 }
 
 console.log('Example:');
