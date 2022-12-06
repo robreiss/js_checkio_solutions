@@ -173,6 +173,7 @@ class Game {
     printgame() {
         console.log('board', this.printboard())
         console.log('hand', this.printhand())
+        console.log('hash', this.hash(), reverse(this.hash()))
     }
 
     printboard(): string {
@@ -186,7 +187,7 @@ class Game {
     hash() {
         let ans = ""
         for (let t of this.board) {
-            ans += t.left + t.right
+            ans += t.left.toString() + t.right.toString()
         }
         return ans
     }
@@ -216,13 +217,18 @@ function playtile(board: Tile[], tile: Tile): boolean {
     }
     return false
 }
+type GameMap = Map<string, Game>
 
-function playturn(games: Game[]): Game[] {
-    let newgames: Game[] = []
-    let newmap: Map<string, Game> = new Map()
-    console.log('game length', games.length)
-    for (let gi = 0; gi < games.length; gi++) {
-        let g = games[gi]
+function playturn(games: GameMap): [GameMap, boolean] {
+    let newmap: GameMap = new Map()
+    console.log('game length', games.size)
+    if (games.size === 0) {
+        return [games, true]
+    }
+    for (let [key, g] of games) {
+        if (g.hand.length === 0) {
+            return [games, true]
+        }
         for (let hi = 0; hi < g.hand.length; hi++) {
             let tile = g.hand[hi]
             for (let ti = 0; ti < 2; ti++) {
@@ -231,14 +237,13 @@ function playturn(games: Game[]): Game[] {
                     let newhand = [...g.hand]
                     newhand.splice(hi, 1)
                     let newgame = new Game(newboard, newhand)
-                    // newgames.push(newgame)
                     newmap.set(newgame.hash(), newgame)
                 }
             tile = tile.flip()
             }
         }
     }
-    return newgames
+    return [newmap, false]
 }
 
 function filtergames(games: Game[]): Game[] {
@@ -252,6 +257,16 @@ function filtergames(games: Game[]): Game[] {
         }
     })
     return games
+}
+
+function dedupe(games: GameMap): GameMap {
+    let seen: GameMap = new Map()
+    for(let [key, value] of games) {
+        if (!seen.has(key) && !seen.has(reverse(key))) {
+            seen.set(key, value)
+        }
+    }
+    return seen
 }
 
 function uniquegames(games: Game[]): Game[] {
@@ -275,20 +290,22 @@ function dominoChain(line: string): number {
     let b: Tile[] = []
     let h = tiles
     let g = new Game(b, h)
-    let games: Game[] = []
-    games.push(g)
+    let games: GameMap = new Map()
+    games.set(g.hash(), g)
 
-    while (games.length > 0 && games[0].hand.length > 0) {
-        games = playturn(games)
-    }
+    const [firstValue] = games.values();
+    let done = false
+    do {
+        [games, done] = playturn(games)
+    } while (!done)
 
-    games = uniquegames(games)
+    games = dedupe(games)
 
-    for (let game of games) {
-        game.printgame()
-    }
+    // for (let [key, game] of games) {
+    //     game.printgame()
+    // }
 
-    return games.length
+    return games.size
 }
 
 console.log('Example:');
@@ -299,20 +316,22 @@ console.log('Example:');
 // console.log(dominoChain('1-5, 2-5, 2-3'), 2);
 // console.log(dominoChain('0-5, 1-5, 2-5, 3-5, 4-5, 3-4'), 0)
 // console.log(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4, 3-0'), 0);
+// console.log(dominoChain('0-2, 0-5, 1-5, 1-3, 5-5'), 1)
 // console.log(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4, 3-0, 0-4'), 0);
 // console.log(dominoChain('0-0, 4-6, 5-6, 1-4, 0-6, 0-5, 1-6, 0-4, 2-2, 0-3, 3-4'))
-console.log(dominoChain('1-2, 0-1, 2-6, 0-0, 5-5, 6-6, 5-6, 4-4, 0-6, 1-5, 1-1, 1-6, 0-5, 3-6, 0-4, 2-5, 2-4'))
+// console.log(dominoChain('1-2, 0-1, 2-6, 0-0, 5-5, 6-6, 5-6, 4-4, 0-6, 1-5, 1-1, 1-6, 0-5, 3-6, 0-4, 2-5, 2-4'))
 // These "asserts" are used for self-checking
-// assert.equal(dominoChain('0-2, 0-5, 1-5, 1-3, 5-5'), 1);
-// assert.equal(dominoChain('1-5, 2-5, 3-5, 4-5, 3-4'), 2);
-// assert.equal(dominoChain('0-5, 1-5, 2-5, 3-5, 4-5, 3-4'), 0);
-// assert.equal(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4'), 6);
-// assert.equal(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4, 3-0, 0-4'), 0);
-// assert.equal(dominoChain('1-2, 2-2, 2-3, 3-3, 3-1'), 5);
-// assert.equal(dominoChain('1-4, 3-4, 0-4, 0-5, 4-5, 2-4, 2-5'), 0);
-// assert.equal(dominoChain('1-4, 1-5, 0-2, 1-6, 4-6, 4-5, 5-6'), 0);
-// assert.equal(dominoChain('1-2, 2-3, 2-4, 3-4, 2-5, 2-6, 5-6'), 8);
-// assert.equal(dominoChain('1-2, 2-3, 3-1, 4-5, 5-6, 6-4'), 0);
-// assert.equal(dominoChain('1-2, 1-4, 1-5, 1-6, 1-1, 2-5, 4-6'), 28);
+assert.equal(dominoChain('0-2, 0-5, 1-5, 1-3, 5-5'), 1);
+assert.equal(dominoChain('1-5, 2-5, 3-5, 4-5, 3-4'), 2);
+assert.equal(dominoChain('0-5, 1-5, 2-5, 3-5, 4-5, 3-4'), 0);
+assert.equal(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4'), 6);
+assert.equal(dominoChain('0-1, 0-2, 1-3, 1-2, 3-4, 2-4, 3-0, 0-4'), 0);
+assert.equal(dominoChain('1-2, 2-2, 2-3, 3-3, 3-1'), 5);
+assert.equal(dominoChain('1-4, 3-4, 0-4, 0-5, 4-5, 2-4, 2-5'), 0);
+assert.equal(dominoChain('1-4, 1-5, 0-2, 1-6, 4-6, 4-5, 5-6'), 0);
+assert.equal(dominoChain('1-2, 2-3, 2-4, 3-4, 2-5, 2-6, 5-6'), 8);
+assert.equal(dominoChain('1-2, 2-3, 3-1, 4-5, 5-6, 6-4'), 0);
+assert.equal(dominoChain('1-2, 1-4, 1-5, 1-6, 1-1, 2-5, 4-6'), 28);
+
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
