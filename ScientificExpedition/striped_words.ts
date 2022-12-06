@@ -20,9 +20,13 @@
 
 import assert from "assert";
 
-function stripedWords(line: string) -> number {
-    // your code here
-    return 0;
+function stripedWords(line: string): number {
+    let re = /((?<=\b)([BCDFGHJKLMNPQRSTVWXZ][aeiouy])+[BCDFGHJKLMNPQRSTVWXZ]?(?=\b))|((?<=\b)([aeiouy][BCDFGHJKLMNPQRSTVWXZ])+[aeiouy]?(?=\b))/gi
+    // let m = re.Mat(line)
+    let m = line.matchAll(re)
+    let c = [...m]
+    // console.log(c)
+    return c.length;
 }
 
 console.log('Example:');
