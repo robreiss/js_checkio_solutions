@@ -18,13 +18,29 @@
 
 import assert from "assert";
 
+function replaceAll(string: string, search:string, replace:string):string {
+    return string.split(search).join(replace);
+}
+
 function currencyStyle(line: string): string {
-    // your code here
-    return "";
+    let re = new RegExp(/\$\d{1,3}(\.\d{3})*(,\d\d)?(?=[^\d,]|$)/g)
+    // let m = line.matchAll(re)
+    // let ma = [...m]
+    // console.log(ma)
+    let ans = line.replace(re, (v) => {
+        return v.replace(/[\.,]/g, v => {
+            return {'.':',', ',':'.'}[v]||''
+        })
+    })
+    return ans
 }
 
 console.log("Example:");
-console.log(currencyStyle("$5.34"));
+console.log(currencyStyle("$5,34"));
+// console.log(
+//     currencyStyle("Is $1.050,25 bigger than $1,050?"),
+//     "Is $1,050.25 bigger than $1,050?"
+// )
 
 // These "asserts" are used for self-checking
 assert.strictEqual(currencyStyle("$5.34"), "$5.34");
