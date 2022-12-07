@@ -19,8 +19,26 @@
 import assert from "assert";
 
 function mostWanted(text: string): string {
-    // your code here
-    return "";
+    let m: Map<string, number> = new Map()
+    text = text.toLowerCase().replace(/[^a-z]/g, '')
+    for (let i = 0; i< text.length; i++) {
+        let l = text[i]
+        m.set(l, (m.get(l) || 0) + 1)
+    }
+    let x = [...m].sort((a, b) => {
+        if (a[1] > b[1]) {
+            return -1
+        }
+        if (a[1] < b[1]) {
+            return 1
+        }
+        return a[0].charCodeAt(0) - b[0].charCodeAt(0)
+    })
+
+    // console.log(x)
+    // text = text.split('').sort().join('')
+    // console.log(text)
+    return x[0][0];
 }
 
 console.log("Example:");

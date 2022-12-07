@@ -16,12 +16,26 @@
 import assert from "assert";
 
 function capsLock(text: string): string {
-    // your code here
-    return text;
+    let ans = ""
+    let caps = false
+    for(let i = 0; i< text.length; i++) {
+        let letter = text[i]
+        if (letter === 'a') {
+            letter = ''
+            caps = caps ? false : true 
+        }
+        if (caps) {
+            letter = letter.toUpperCase()
+        }
+        ans += letter
+    }
+    return ans;
 }
 
 console.log("Example:");
-console.log(capsLock("Why are you asking me that?"));
+// console.log(capsLock("Why are you asking me that?"));
+console.log(capsLock("Always wanted to visit Zambia."),
+"AlwYS Wnted to visit ZMBI.")
 
 // These "asserts" are used for self-checking
 assert.equal(

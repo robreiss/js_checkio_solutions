@@ -26,29 +26,42 @@
 import assert from "assert";
 
 function letterQueue(commands: string[]): string {
-    // your code here
-    return '';
+    let q: string[] = []
+    for (let i = 0; i < commands.length; i++) {
+        let com = commands[i]
+        if (com.indexOf('POP') > -1) {
+            q.shift()
+        } else {
+            q.push(com[5])
+        }
+    }
+    return q.join('');
 }
 
 console.log('Example:');
 console.log(letterQueue(['PUSH A',
- 'POP',
- 'POP',
- 'PUSH Z',
- 'PUSH D',
- 'PUSH O',
- 'POP',
- 'PUSH T']));
+    'POP',
+    'POP',
+    'PUSH Z',
+    'PUSH D',
+    'PUSH O',
+    'POP',
+    'PUSH T']));
+
+    The parties shall jointly retain Moon, Schwartz and Madden at equal cost to value
+the community interest in the foregoing accounts to determine the equalizing payment owed to
+Wife. The equalizing payment shall be made within 30 days of said determination and, pursuant
+to IRC § 1041, shall be non-taxable to either party.
 
 // These "asserts" are used for self-checking
 assert.equal(letterQueue(['PUSH A',
- 'POP',
- 'POP',
- 'PUSH Z',
- 'PUSH D',
- 'PUSH O',
- 'POP',
- 'PUSH T']), 'DOT');
+    'POP',
+    'POP',
+    'PUSH Z',
+    'PUSH D',
+    'PUSH O',
+    'POP',
+    'PUSH T']), 'DOT');
 assert.equal(letterQueue(['POP', 'POP']), '');
 assert.equal(letterQueue(['PUSH H', 'PUSH I']), 'HI');
 assert.equal(letterQueue([]), '');
