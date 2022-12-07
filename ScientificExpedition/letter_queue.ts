@@ -48,11 +48,6 @@ console.log(letterQueue(['PUSH A',
     'POP',
     'PUSH T']));
 
-    The parties shall jointly retain Moon, Schwartz and Madden at equal cost to value
-the community interest in the foregoing accounts to determine the equalizing payment owed to
-Wife. The equalizing payment shall be made within 30 days of said determination and, pursuant
-to IRC § 1041, shall be non-taxable to either party.
-
 // These "asserts" are used for self-checking
 assert.equal(letterQueue(['PUSH A',
     'POP',

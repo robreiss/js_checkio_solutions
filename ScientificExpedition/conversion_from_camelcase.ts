@@ -17,8 +17,19 @@
 import assert from "assert";
 
 function fromCamelCase(name: string): string {
-    // your code here
-    return name;
+    let ans =''
+    for(let i =0; i< name.length; i++) {
+        let letter = name[i]
+        if (letter === letter.toLowerCase()) {
+            ans += letter
+        } else {
+            if (i > 0) {
+                ans += '_'
+            }
+            ans += letter.toLowerCase()
+        }
+    }
+    return ans;
 }
 
 console.log("Example:");

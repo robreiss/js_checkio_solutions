@@ -17,8 +17,22 @@
 import assert from "assert";
 
 function toCamelCase(name: string): string {
-    // your code here
-    return name;
+    let ans = ''
+    let caps = false
+    for (let i = 0; i < name.length; i++) {
+        let letter = name[i]
+        if (letter !== '_') {
+            if (caps || i === 0) {
+                ans += letter.toUpperCase()
+            } else {
+                ans += letter
+            }
+            caps = false
+        } else {
+            caps = true
+        }
+    }
+    return ans;
 }
 
 console.log("Example:");

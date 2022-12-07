@@ -23,16 +23,23 @@ import assert from "assert";
 
 function findMessage(message: string): string {
     // your code here
-    return message;
+    let ans = ''
+    for (let i = 0; i < message.length; i++) {
+        let letter = message[i]
+        if (letter !== letter.toLowerCase()) {
+            ans += letter
+        }
+    }
+    return ans;
 }
 
 console.log('Example:');
 console.log(findMessage(('How are you? Eh, ok. Low or Lower? '
- + 'Ohhh.')));
+    + 'Ohhh.')));
 
 // These "asserts" are used for self-checking
 assert.equal(findMessage(('How are you? Eh, ok. Low or Lower? '
- + 'Ohhh.')), 'HELLO');
+    + 'Ohhh.')), 'HELLO');
 assert.equal(findMessage('hello world!'), '');
 assert.equal(findMessage('HELLO WORLD!!!'), 'HELLOWORLD');
 
