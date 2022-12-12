@@ -20,14 +20,92 @@
 
 import assert from "assert";
 
+function checkgate(W: number, d: number, x0: number): boolean {
+    if (x0 > (W - d) / 2 && x0 < (W - (W - d) / 2)) {
+        return true
+    }
+    return false
+}
 function escape(jar: number[], fly: number[]): boolean {
     const [W, H, d] = jar;
-    const [x0, y0, vx, vy] = fly;
+    let [x0, y0, vx, vy] = fly;
+    if (vy == 0) {
+        return false
+    }
+    if (vx == 0) {
+        return checkgate(W, d, x0)
+    }
+    // calculate the fist intersection
+    let x: number = 0
+    let y: number = 0
+    for (let i = 0; i < 20; i++) {
+        if (vx > 0 && vy > 0) {
+            x = W
+            y = y0 + (vy * (x - x0)) / vx
+            if (y < H) { // hit right
+                console.log("ur - right", x, y)
+                vx = -vx
+            } else { // hit top
+                y = H
+                x = x0 + (vx * (y - y0)) / vy
+                console.log("ur - top", x, y)
+                if (checkgate(W, d, x)) {
+                    return true
+                }
+                vy = -vy
+            }
+        } else if (vx < 0 && vy > 0) {
+            x = 0
+            y = y0 + (vy * (x - x0)) / vx
+            if (y < H) { // hit left
+                console.log("ul - left", x, y)
+                vx = -vx
+            } else { // hit top
+                y = H
+                x = x0 + (vx * (y - y0)) / vy
+                console.log("ul - top", x, y)
+                if (checkgate(W, d, x)) {
+                    return true
+                }
+                vy = -vy
+            }
+        } else if (vx > 0 && vy < 0) {
+            x = W
+            y = y0 + (vy * (x - x0)) / vx
+            if (y > 0) { // hit right
+                console.log("dr - right", x, y)
+                vx = -vx
+            } else { // hit bottom
+                y = 0
+                x = x0 + (vx * (y - y0)) / vy
+                console.log("dr - bottom", x, y)
+                vy = -vy
+            }
+        } else {
+            x = 0
+            y = y0 + (vy * (x - x0)) / vx
+            if (y > 0) { // hit left
+                console.log("dl - left", x, y)
+                vx = -vx
+            } else { // hit bottom
+                y = 0
+                x = x0 + (vx * (y - y0)) / vy
+                console.log("dl - bottom", x, y)
+                vy = -vy
+            }
+        }
+        x0 = x
+        y0 = y
+    }
     return false;
 }
 
 console.log('Example:');
-console.log(escape([1000, 500, 200], [0, 0, 100, 0]));
+// console.log(escape([1000, 500, 200], [0, 0, 100, 0]), false);
+// console.log(escape([1000, 500, 200], [450, 50, 0, -100]), true);
+// console.log(escape([1000, 500, 200], [850, 50, 0, -100]), false);
+// console.log(escape([1000, 2000, 200], [20, 35, 100, 175]), true);
+// console.log(escape([1200,2000,400], [50,1250,1,5]), true); 
 
 // These "asserts" are used for self-checking
 assert.equal(escape([1000, 500, 200], [0, 0, 100, 0]), false);
