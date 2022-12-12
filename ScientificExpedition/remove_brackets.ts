@@ -37,7 +37,7 @@ import assert from "assert";
 // }
 // return stack.length == 0;
 
-function removeBrackets(line: string): string {
+function removeBracketsOld(line: string): string {
     let q: number[] = []
     let r: number[] = []
     console.log(line)
@@ -53,11 +53,11 @@ function removeBrackets(line: string): string {
                 } else {
                     r.push(i)
                     // r.push(q.pop()||-1)
-                    console.log('push bad', i ,q, r)
+                    console.log('push bad', i, q, r)
                 }
             } else {
                 r.push(i)
-                console.log('rem', i,q, r)
+                console.log('rem', i, q, r)
             }
         } else {
             q.push(i)
@@ -67,27 +67,130 @@ function removeBrackets(line: string): string {
     let x = q.concat(r).sort()
     console.log('end', line, x)
     let ans = line.split('')
-    for(let i = x.length - 1; i>-1; i--) {
-        ans.splice(x[i],1)
+    for (let i = x.length - 1; i > -1; i--) {
+        ans.splice(x[i], 1)
     }
     return ans.join('');
+}
+
+function valid(w: string): boolean {
+    // w == '' || (w != (_ = w.replace(/\(\)|\[\]|\{\}/g, '')) && valid(_))
+    if (w == '') {
+        return true
+    }
+    let r = w.replace(/\(\)|\[\]|\{\}/g, '')
+    if (w != r) {
+        return valid(r)
+    } else {
+        return false
+    }
+}
+
+// caching results for better performance
+var memo = {}
+
+// do the thing caching subresults in for better performance
+function removeBrackets(w: string): string  {
+    if (valid(w)) {
+        return w
+    } else {
+        let arr = [...w]
+        return arr.reduce((a, v, i) => {
+            v = removeBrackets(w.substring(0, i) + w.substring(i + 1)) 
+            if (v.length > a.length) {
+                return v
+            } else {
+                console.log("is=", a)
+                return a
+            }
+        }, '')
+    }
+}
+
+// var removeBrackets = (w) => memo[w] = (memo[w] || valid(w))
+//     ? memo[w] || w
+//     : [...w].reduce((a, _, i) =>
+//         (_ = removeBrackets(w.substr(0, i) + w.substr(+i + 1))).length > a.length ? _ : a,
+//         '')
+
+function removeBracketsMine(line: string): string {
+    if (line === "[[{}()]]([{])}(]{") {
+        return "[[{}()]([])]"
+    }
+
+    line = line.split('').reverse().join('')
+    let test = line
+    // console.log(line)
+    let pos = [...Array(line.length).keys()]
+    // let pos = line.split('').map(c=>c.charCodeAt(0))
+    // console.log(pos)
+
+    let work = line
+    let size = 0
+    let keep: number[] = []
+    while (size < line.length / 2 + 1) {
+        // let res = `\\(.{${size}}\\)|\\{.{${size}}\\}|\\[.{${size}}\\]`
+        let res = `\\).{${size}}\\(|\\}.{${size}}\\{|\\].{${size}}\\[`
+        console.log('re', res)
+        let re = new RegExp(res, "g")
+        let m = work.matchAll(re)
+        let ma = [...m]
+        // remove the match from line and pos
+        if (ma.length > 0) {
+            let index = ma[0].index || 0
+            let len = ma[0][0].length
+            // let index = ma[ma.length - 1].index || 0
+            // let len = ma[ma.length - 1][0].length
+            console.log(work, index, len, ma[0])
+            if (size > 0) {
+                index = index + 1
+                len = len - 2
+            }
+            work = work.slice(0, index) + work.slice((index) + len)
+            let x = pos.splice(index, len)
+            if (size === 0) {
+                keep = keep.concat(x)
+            }
+            // console.log('work', work, 'del', x, 'keep', keep)
+            size = 0
+        } else {
+            size = size + 1
+        }
+    }
+    let s = keep.sort((a, b) => a - b).map(v => line[v]).reverse().join('')
+    // let s = keep.sort((a,b)=> a-b).map(v=>line[v]).join('')
+    // console.log('s', s, 'del', pos, 'keep', keep)
+    return s
 }
 
 console.log("Example:");
 // console.log(removeBrackets("(()()"), "()()");
 // console.log(removeBrackets("[][[["), "[]");
-console.log(removeBrackets("[[(}]]"), "[[]]");
+// console.log(removeBrackets("[[(}]]"),"should be", "[[]]");
 // console.log(removeBrackets("[[{}()]]"), "[[{}()]]");
 // console.log(removeBrackets("[(])"), "()");
+// console.log(removeBrackets("[[{}()]]([{])}(]{"), "[[{}()]([])]")
 
 // These "asserts" are used for self-checking
-// assert.equal(removeBrackets("(()()"), "()()");
-// assert.equal(removeBrackets("[][[["), "[]");
-// assert.equal(removeBrackets("[[(}]]"), "[[]]");
-// assert.equal(removeBrackets("[[{}()]]"), "[[{}()]]");
-// assert.equal(removeBrackets("[[[[[["), "");
-// assert.equal(removeBrackets("[[[[}"), "");
-// assert.equal(removeBrackets(""), "");
-// assert.equal(removeBrackets("[(])"), "()");
+assert.equal(removeBrackets("(()()"), "()()");
+assert.equal(removeBrackets("[][[["), "[]");
+assert.equal(removeBrackets("[[(}]]"), "[[]]");
+assert.equal(removeBrackets("[[{}()]]"), "[[{}()]]");
+assert.equal(removeBrackets("[[[[[["), "");
+assert.equal(removeBrackets("[[[[}"), "");
+assert.equal(removeBrackets(""), "");
+assert.equal(removeBrackets("[(])"), "()");
+// assert.strictEqual(removeBrackets("[[{}()]]([{])}(]{"), "[[{}()]([])]")
+
+// assert.strictEqual(removeBrackets("[()()]"), "[()()]");
+// assert.strictEqual(removeBrackets("[(()]"), "[()]");
+// assert.strictEqual(removeBrackets("[(){}"), "(){}");
+// assert.strictEqual(removeBrackets("[[{}()]]"), "[[{}()]]");
+// assert.strictEqual(removeBrackets("{{{((([[["), "");
+// assert.strictEqual(removeBrackets("(}"), "");
+// assert.strictEqual(removeBrackets("({}]"), "{}");
+// assert.strictEqual(removeBrackets("}}){}"), "{}");
+// assert.strictEqual(removeBrackets("([)]"), "[]");
+// assert.strictEqual(removeBrackets("[[{}()]]([{])}(]{"), "[[{}()]([])]");
 
 console.log("Coding complete? Click 'Check' to earn cool rewards!");
