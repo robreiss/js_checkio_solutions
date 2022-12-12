@@ -32,8 +32,27 @@
 import assert from "assert";
 
 function totalCost(a: string[]): number {
-    // your code here
-    return undefined;
+    let ans = 0
+
+    // combine the durations of a day into a single value
+    let days: Map<string, number> = new Map()
+    for(let i=0; i<a.length; i++) {
+        let day = a[i].substring(0,10)
+        let sec = Number(a[i].substring(20))
+        // convert sec to minutes
+        let min = Math.ceil(sec/60)
+        min = min + (days.get(day) || 0)
+        days.set(day, min)
+    }
+    for(let [_, dur] of days) {
+        if (dur > 100) {
+            ans += 100 + ((dur - 100) * 2)
+        } else {
+            ans += dur
+        }
+    }
+
+    return ans;
 }
 
 console.log('Example:');
